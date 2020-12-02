@@ -6,8 +6,10 @@ as background tasks
 Run this as a server using uvicorn with:
 > uvicorn sub_services.sub_service:app --reload
 
-todo: Try out dependency-injection next
- https://fastapi.tiangolo.com/tutorial/background-tasks/#dependency-injection
+Test with requests
+res = requests.post('http://127.0.0.1:8000/write-to-log?q=1234567890abcdef',
+    json={'address': 'my@email.com', 'message': 'Hello FastAPI!'})
+
 """
 from time import sleep
 from typing import Optional
@@ -34,14 +36,15 @@ def write_to_log(message: str):
 
 def get_query(background_tasks: BackgroundTasks, q: Optional[str] = None):
     if q:
-        message = f'Found query {q}'
+        message = f'Found query {q}\n'
         background_tasks.add_task(write_to_log, message)
     return q
 
 
 @app.post('/write-to-log')
-async def summation(email: WriteToLogQuery,
-                    background_tasks: BackgroundTasks):
+async def summation(query_params: WriteToLogQuery,
+                    background_tasks: BackgroundTasks,
+                    q: str = Depends(get_query)):
     """Example of endpoint doing queries in the background
 
     email: str
@@ -53,9 +56,6 @@ async def summation(email: WriteToLogQuery,
     Dict
         Json of status
     """
-    try:
-        log = f'Message to {email.address}: {email.message}\n'
-        background_tasks.add_task(write_to_log, log)
-        return {'message': 'Message written in background'}
-    except Exception as exc:
-        return {'message': f'Something went wrong: {str(exc)}'}
+    log = f'Message to {query_params.address}: {query_params.message} {q}\n'
+    background_tasks.add_task(write_to_log, log)
+    return {'message': 'Message written in background'}
