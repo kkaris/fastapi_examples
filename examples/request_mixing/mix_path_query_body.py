@@ -97,6 +97,6 @@ async def mixing(pathvar: Optional[str] = None,
      'dimensions': [0.0, 1.0, 2.0, 3.0]}}
 
     """
-    return {'path_var': path_var,
+    return {'path_var': pathvar,
             'query_param': query_param,
             'body': body.__dict__ if body else body}
