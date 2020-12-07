@@ -10,9 +10,10 @@ In this case we'll be following this structure:
    with "job done, find result here <link>" is returned
 3. Service moves on to the next job in line
 """
+import json
 import asyncio
 from pathlib import Path
-from fastapi import FastAPI, status, BackgroundTasks
+from fastapi import FastAPI, status as http_status, BackgroundTasks
 from pydantic import BaseModel
 from collections import deque
 from random import randint
@@ -23,9 +24,9 @@ HERE = Path(__file__).parent
 DATA_DIR = HERE.parent.parent.joinpath('data')
 
 queues = dict(
-    pending=deque(),
-    working=deque(),
-    finished=deque()
+    pending={},
+    working={},
+    finished={}
 )
 
 
@@ -34,30 +35,61 @@ class PollReq(BaseModel):
     id: str
 
 
-def get_work_status(job_id: str):
+class JobStatus(BaseModel):
+    """JobStatus model"""
+    status: str
+    id: str
+    query: NetworkSearchQuery
+    result: str = None
+    location: str = None
+
+
+class JobStatusException(Exception):
+    """Raise when a job status could not be updated"""
+
+
+async def get_work_status(job_id: str):
     """Check the status of a job"""
     for q in ['finished', 'working', 'pending']:
-        for job in queues[q]:
-            if str(job['id']) == job_id:
+        for query_hash, job in queues[q]:
+            if query_hash == job_id:
                 return job, q
+
+
+async def update_job_status(qh: str, from_status: str, to_status: str):
+    try:
+        job = queues[from_status].pop(qh)
+        assert job is not None
+        await update_status(job, to_status)
+        queues[to_status][qh] = job
+    except AssertionError:
+        raise JobStatusException(f'Could not find job {qh} in queue')
+
+
+async def add_job(job: JobStatus):
+    # todo add job to queue
+    pass
+
+
+async def update_status(job: JobStatus, to_status: str):
+    job.status = to_status
 
 
 async def crunch_the_numbers(q: NetworkSearchQuery):
     """Function representing some CPU heavy task"""
+    q_hash = q.get_hash()
+    # Update job status to 'working', check we actually got a job
+    await update_job_status(q_hash, 'pending', 'working')
     res = {'result': 'path found',
-           'number_of_path': 10,
+           'number_of_paths': 10,
            'source': q.source,
            'target': q.target}
     await asyncio.sleep(randint(1, 30))
-    return res
-
-
-def create_job(background_tasks: BackgroundTasks, query: NetworkSearchQuery):
-    """Function that creates a job that is run in the background"""
-    qh = query.get_hash()
-    background_tasks.add_task(crunch_the_numbers, query)
-    queues['pending'].append(qh)
-    return qh
+    # Write to file
+    with DATA_DIR.joinpath().open(f'{q_hash}_result.json') as f:
+        json.dump(fp=f, obj=res)
+    # Update job status to 'finished', check we actually got a job
+    await update_job_status(q_hash, 'working', 'finished')
 
 
 @app.post('/poll')
@@ -70,8 +102,17 @@ async def poll(pq: PollReq):
     return resp
 
 
-@app.post('/status/{id}')
-async def get_job_status(id: str):
-    job, job_status = get_work_status(id)
-
-# todo create query receiver that submits a job
+@app.post('/submit_job', status_code=http_status.HTTP_202_ACCEPTED,
+          response_model=JobStatus)
+async def submit_job(nsq: NetworkSearchQuery,
+                     background_tasks: BackgroundTasks):
+    # Get query hash
+    query_hash = nsq.get_hash()
+    # Create a dict representing a JobStatus
+    job_status = {'id': query_hash, 'status': 'pending', 'query': nsq}
+    # Add job to background process
+    background_tasks.add_task(crunch_the_numbers, nsq)
+    # Update jobqueue
+    queues['pending'].append(job_status)
+    # Return job status
+    return job_status
