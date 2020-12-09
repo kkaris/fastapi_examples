@@ -4,20 +4,39 @@ the server is done with its task
 
 In this case we'll be following this structure:
 1. Server gets a job request, returns an ID with a 202 ACCEPTED status code
-   and puts the job in the queue
-2. Client polls server until a response with "job done, find result here
-   <link>" is returned (in the future, client could poll a different service
-   than this one, e.g. other FastAPI service or AWS S3)
+   and puts the job in the queue <-- DONE
+2. Client polls "<location>" until 200 is returned (could poll S3?)
 3. Service moves on to the next job in line
 
 Todo:
- - Serve results as static json files:
-   https://fastapi.tiangolo.com/tutorial/static-files/
+ - Return the final location of the result with the initial request, i.e. we
+   want '/data/{job_id}_result.json' to be returned in 'location'
  - Use deque to "simulate" actual job queue instead. Requires some type of
    event handling/while loop to "run until no more jobs", where submitted
    jobs are either started immediately if the server state is "awaiting
    jobs" or put in the queue if the server state is "working".
    https://testdriven.io/blog/developing-an-asynchronous-task-queue-in-python/
+
+Try with:
+res = requests.post('http://127.0.0.1:8000/submit_job', json=<VALID JSON>)
+job_id = str(res.json()['id']) if res.status_code in [200, 202] else \
+    res.status_code; print(job_id)
+res = requests.get(f'http://127.0.0.1:8000/data/{job_id}_result.json')
+n = 1
+while res.status_code != 200:
+    print(f'Got status {res.status_code}, waiting for {n} seconds')
+    sleep(n)
+    res = requests.get(f'http://127.0.0.1:8000/data/{job_id}_result.json')
+    n *= 2
+print(res.json())
+
+Example output:
+Got status 404, waiting for 1 seconds
+Got status 404, waiting for 2 seconds
+Got status 404, waiting for 4 seconds
+{'result_text': 'path found', 'number_of_paths': 10, 'source': 'IRAK3',
+'target': 'EGFR'}
+
 
 As always, run with
 > uvicorn module.file:app --reload
@@ -35,7 +54,9 @@ from indra_depmap_service.util import NetworkSearchQuery
 
 app = FastAPI()
 HERE = Path(__file__).parent
-DATA_DIR = HERE.parent.joinpath('data')
+DATA_DIR = HERE.parent.absolute().joinpath('data')
+print(f'DATA_DIR={DATA_DIR}')
+print(f'DATA_DIR={DATA_DIR.absolute().as_posix()}')
 app.mount('/data', StaticFiles(directory=DATA_DIR.absolute().as_posix()),
           name='data')
 logger = logging.getLogger(__name__)
@@ -49,7 +70,7 @@ queues = dict(
 
 class PollReq(BaseModel):
     """Polling request body"""
-    id: str
+    job_id: str
 
 
 class Result(BaseModel):
@@ -75,14 +96,18 @@ class JobStatusException(Exception):
 
 def get_work_status(job_id: str) -> Tuple[Optional[JobStatus], str]:
     """Check the status of a job"""
+    logger.info(f'Looking for job {job_id}')
     for q in ['finished', 'working', 'pending']:
-        for query_hash, job in queues[q]:
+        for query_hash, job in queues[q].items():
             if query_hash == job_id:
+                logger.info(f'Found job {job_id} in queue "{q}"')
                 return job, q
+    logger.info(f'Job {job_id} was not found in any queue')
     return None, 'no_such_job'
 
 
 def update_job_status(qh: str, from_status: str, to_status: str):
+    logger.info(f'Updating job {qh} from {from_status} to {to_status}')
     try:
         job = queues[from_status].pop(qh)
         assert job is not None
@@ -94,7 +119,9 @@ def update_job_status(qh: str, from_status: str, to_status: str):
 
 def add_job(job: JobStatus):
     job.status = 'pending'
-    queues['pending'][job.query.get_hash()] = job
+    qh = job.query.get_hash()
+    queues['pending'][qh] = job
+    logger.info(f'Added job {qh} to {job.status}')
 
 
 async def crunch_the_numbers(q: NetworkSearchQuery):
@@ -105,6 +132,7 @@ async def crunch_the_numbers(q: NetworkSearchQuery):
     Set location to URL
     """
     q_hash = q.get_hash()
+    logger.info(f'Crunching numbers for job {q_hash}')
     # Update job status to 'working', check we actually got a job
     update_job_status(q_hash, 'pending', 'working')
     job, status = get_work_status(q_hash)
@@ -112,37 +140,34 @@ async def crunch_the_numbers(q: NetworkSearchQuery):
     # Create Result object
     res = Result(result_text='path found', number_of_paths=10,
                  source=q.source, target=q.target)
+    logger.info(f'Finished on job {q_hash}')
     # Update job.result
     job.result = res
     # Write result to file
     fname = f'{q_hash}_result.json'
-    with DATA_DIR.joinpath(fname).open() as f:
+    with DATA_DIR.joinpath(fname).open('w') as f:
+        logger.info(f'Writing results to {DATA_DIR.joinpath(fname)}')
         json.dump(fp=f, obj=res.dict())
     # Update job.location
     job.location = f'/data/{fname}'
     # Update job status to 'finished', check we actually got a job
     update_job_status(q_hash, 'working', 'finished')
-
-
-@app.post('/poll', response_model=JobStatus)
-async def poll(pq: PollReq):
-    logger.info(f'Got poll request for job {pq.id}')
-    job_status, queue = get_work_status(pq.id)
-    logger.info(f'Job found has status {queue}')
-    return job_status
+    logger.info(f'Job {q_hash} terminated successfully')
 
 
 @app.post('/submit_job', status_code=http_status.HTTP_202_ACCEPTED,
           response_model=JobStatus)
-async def submit_job(nsq: NetworkSearchQuery,
-                     background_tasks: BackgroundTasks):
+def submit_job(nsq: NetworkSearchQuery,
+               background_tasks: BackgroundTasks):
     # Get query hash
     query_hash = nsq.get_hash()
     # Create new JobStatus object
+    logger.info(f'Creating new job: {query_hash}')
     job = JobStatus(id=query_hash, status='pending', query=nsq)
     # Add job
     add_job(job)
     # Add job to background process
+    logger.info(f'Sent job {query_hash} to run in background')
     background_tasks.add_task(crunch_the_numbers, nsq)
     # Return job status
     return job
