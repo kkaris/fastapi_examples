@@ -18,6 +18,9 @@ Todo:
    jobs are either started immediately if the server state is "awaiting
    jobs" or put in the queue if the server state is "working".
    https://testdriven.io/blog/developing-an-asynchronous-task-queue-in-python/
+
+As always, run with
+> uvicorn module.file:app --reload
 """
 import json
 import asyncio
@@ -25,14 +28,16 @@ import logging
 from typing import Tuple, Optional
 from pathlib import Path
 from fastapi import FastAPI, status as http_status, BackgroundTasks
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from collections import deque
 from random import randint
 from indra_depmap_service.util import NetworkSearchQuery
 
 app = FastAPI()
 HERE = Path(__file__).parent
-DATA_DIR = HERE.parent.parent.joinpath('data')
+DATA_DIR = HERE.parent.joinpath('data')
+app.mount('/data', StaticFiles(directory=DATA_DIR.absolute().as_posix()),
+          name='data')
 logger = logging.getLogger(__name__)
 
 queues = dict(
@@ -103,7 +108,7 @@ async def crunch_the_numbers(q: NetworkSearchQuery):
     # Update job status to 'working', check we actually got a job
     update_job_status(q_hash, 'pending', 'working')
     job, status = get_work_status(q_hash)
-    await asyncio.sleep(randint(1, 30))
+    await asyncio.sleep(randint(2, 30))
     # Create Result object
     res = Result(result_text='path found', number_of_paths=10,
                  source=q.source, target=q.target)
@@ -116,7 +121,7 @@ async def crunch_the_numbers(q: NetworkSearchQuery):
     # Update job.location
     job.location = f'/data/{fname}'
     # Update job status to 'finished', check we actually got a job
-    await update_job_status(q_hash, 'working', 'finished')
+    update_job_status(q_hash, 'working', 'finished')
 
 
 @app.post('/poll', response_model=JobStatus)
