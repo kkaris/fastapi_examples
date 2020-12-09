@@ -140,6 +140,8 @@ async def submit_job(nsq: NetworkSearchQuery,
     query_hash = nsq.get_hash()
     # Create new JobStatus object
     job = JobStatus(id=query_hash, status='pending', query=nsq)
+    # Add job
+    add_job(job)
     # Add job to background process
     background_tasks.add_task(crunch_the_numbers, nsq)
     # Return job status
