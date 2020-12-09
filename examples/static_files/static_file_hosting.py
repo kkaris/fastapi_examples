@@ -1,6 +1,9 @@
 """
 Example of providing static files
 
+File will exist at:
+http://localhost:8000/data/3809006135_query.json
+
 As always, run with
 > uvicorn module.file:app --reload
 """
