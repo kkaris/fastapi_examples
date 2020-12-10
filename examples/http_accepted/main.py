@@ -87,18 +87,26 @@ class JobStatus(BaseModel):
     id: str
     query: NetworkSearchQuery
     result: Result = None
+    fname: str = None
     location: str = None
 
     def get_fname(self):
         """Get the file name for the query"""
         # Create file name
-        fname = f'{self.query.get_hash()}_result.json'
-        self._set_location(fname)
-        return fname
+        if self.location is None:
+            self.set_location()
+        return self.fname
 
-    def _set_location(self, fname):
+    def _set_fname(self):
+        self.fname = f'{self.query.get_hash()}_result.json'
+
+    def set_location(self):
+        """Set self.location"""
+        # Initialize fname
+        if self.fname is None:
+            self._set_fname()
         # Set job.location
-        self.location = f'/data/{fname}'
+        self.location = f'/data/{self.fname}'
 
 
 class JobStatusException(Exception):
@@ -177,10 +185,7 @@ def submit_job(nsq: NetworkSearchQuery,
     # Create new JobStatus object
     logger.info(f'Creating new job: {query_hash}')
     job = JobStatus(id=query_hash, status='pending', query=nsq)
-    # Create file name
-    fname = f'{query_hash}_result.json'
-    # Update job.location
-    job.location = f'/data/{fname}'
+    job.set_location()
     # Add job
     add_job(job)
     # Add job to background process
