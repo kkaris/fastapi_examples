@@ -90,6 +90,7 @@ class JobStatus(BaseModel):
     location: str = None
 
     def get_fname(self):
+        """Get the file name for the query"""
         # Create file name
         fname = f'{self.query.get_hash()}_result.json'
         self._set_location(fname)
@@ -117,6 +118,7 @@ def get_work_status(job_id: str) -> Tuple[Optional[JobStatus], str]:
 
 
 def update_job_status(qh: str, from_status: str, to_status: str):
+    """Update the job status from from_status to to_status"""
     logger.info(f'Updating job {qh} from {from_status} to {to_status}')
     try:
         job = queues[from_status].pop(qh)
@@ -128,6 +130,7 @@ def update_job_status(qh: str, from_status: str, to_status: str):
 
 
 def add_job(job: JobStatus):
+    """Add a job to the queue"""
     job.status = 'pending'
     qh = job.query.get_hash()
     queues['pending'][qh] = job
@@ -168,6 +171,7 @@ async def crunch_the_numbers(q: NetworkSearchQuery):
           response_model=JobStatus)
 def submit_job(nsq: NetworkSearchQuery,
                background_tasks: BackgroundTasks):
+    """Handles job submissions"""
     # Get query hash
     query_hash = nsq.get_hash()
     # Create new JobStatus object
