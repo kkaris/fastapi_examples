@@ -89,6 +89,16 @@ class JobStatus(BaseModel):
     result: Result = None
     location: str = None
 
+    def get_fname(self):
+        # Create file name
+        fname = f'{self.query.get_hash()}_result.json'
+        self._set_location(fname)
+        return fname
+
+    def _set_location(self, fname):
+        # Set job.location
+        self.location = f'/data/{fname}'
+
 
 class JobStatusException(Exception):
     """Raise when a job status could not be updated"""
@@ -143,15 +153,14 @@ async def crunch_the_numbers(q: NetworkSearchQuery):
     logger.info(f'Finished on job {q_hash}')
     # Update job.result
     job.result = res
-    # Write result to file
-    fname = f'{q_hash}_result.json'
+    # Get file name. This also set job.location
+    fname = job.get_fname()
     with DATA_DIR.joinpath(fname).open('w') as f:
         logger.info(f'Writing results to {DATA_DIR.joinpath(fname)}')
-        json.dump(fp=f, obj=res.dict())
-    # Update job.location
-    job.location = f'/data/{fname}'
+        json.dump(fp=f, obj=job.dict())
     # Update job status to 'finished', check we actually got a job
     update_job_status(q_hash, 'working', 'finished')
+    logger.info(f'Results served at {job.location}')
     logger.info(f'Job {q_hash} terminated successfully')
 
 
@@ -164,6 +173,10 @@ def submit_job(nsq: NetworkSearchQuery,
     # Create new JobStatus object
     logger.info(f'Creating new job: {query_hash}')
     job = JobStatus(id=query_hash, status='pending', query=nsq)
+    # Create file name
+    fname = f'{query_hash}_result.json'
+    # Update job.location
+    job.location = f'/data/{fname}'
     # Add job
     add_job(job)
     # Add job to background process
