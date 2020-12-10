@@ -5,12 +5,14 @@ the server is done with its task
 In this case we'll be following this structure:
 1. Server gets a job request, returns an ID with a 202 ACCEPTED status code
    and puts the job in the queue <-- DONE
-2. Client polls "<location>" until 200 is returned (could poll S3?)
+2. Client polls "<location>" until 200 is returned (could poll S3?) OR polls
+   polling endpoint on
 3. Service moves on to the next job in line
 
 Todo:
- - Return the final location of the result with the initial request, i.e. we
-   want '/data/{job_id}_result.json' to be returned in 'location'
+ - Re-create the polling endpoint by using multiprocessing global variables:
+   https://stackoverflow.com/questions/30333591/
+   python-3-global-variables-with-asyncio-apscheduler
  - Use deque to "simulate" actual job queue instead. Requires some type of
    event handling/while loop to "run until no more jobs", where submitted
    jobs are either started immediately if the server state is "awaiting
