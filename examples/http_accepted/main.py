@@ -10,11 +10,12 @@ In this case we'll be following this structure:
 3. Service moves on to the next job in line
 
 Todo:
- - META: create remote on your github
- - Re-create the polling endpoint by using multiprocessing global variables:
-   https://stackoverflow.com/questions/30333591/
-   python-3-global-variables-with-asyncio-apscheduler
-   https://docs.python.org/3.7/library/asyncio-sync.html#asyncio-sync
+ - Fix polling by:
+    * Every time the job changes status, a meta data json is
+      uploaded/updated (the upload us done with a background task) that is
+      served by service/S3
+    * The client checks that json regularly and reads to the results when
+      the results json becomes available
    OR
    Work around threading by having the polling endpoint check if the
    resulting file is available or not
