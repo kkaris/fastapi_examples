@@ -10,14 +10,24 @@ In this case we'll be following this structure:
 3. Service moves on to the next job in line
 
 Todo:
+ - META: create remote on your github
  - Re-create the polling endpoint by using multiprocessing global variables:
    https://stackoverflow.com/questions/30333591/
    python-3-global-variables-with-asyncio-apscheduler
- - Use deque to "simulate" actual job queue instead. Requires some type of
-   event handling/while loop to "run until no more jobs", where submitted
-   jobs are either started immediately if the server state is "awaiting
-   jobs" or put in the queue if the server state is "working".
+   https://docs.python.org/3.7/library/asyncio-sync.html#asyncio-sync
+   OR
+   Work around threading by having the polling endpoint check if the
+   resulting file is available or not
+   OR
+   maybe the "polling problem" of shared variables and having the polling
+   endpoint accessing them is solved by the python asyncio-queue (see below)
+ - Create an actual job queue:
+   https://docs.python.org/3/library/
+   asyncio-queue.html#asyncio-example-queue-dist
    https://testdriven.io/blog/developing-an-asynchronous-task-queue-in-python/
+   OR
+   Celery:
+   https://docs.celeryproject.org/en/stable/
 
 Try with:
 res = requests.post('http://127.0.0.1:8000/submit_job', json=<VALID JSON>)
@@ -46,12 +56,13 @@ As always, run with
 import json
 import asyncio
 import logging
+
+from random import randint
 from typing import Tuple, Optional
 from pathlib import Path
 from fastapi import FastAPI, status as http_status, BackgroundTasks
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from random import randint
 from indra_depmap_service.util import NetworkSearchQuery
 
 app = FastAPI()
