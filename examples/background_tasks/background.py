@@ -1,3 +1,12 @@
+"""
+Show how to run a task in the background without the server being
+unresponsive while the task is performed.
+
+The example show how background tasks can be done in two ways:
+1. Explicitly through adding a background task using BackgroundTasks
+2. Implicitly via dependency injection using Depends to activate a function
+   that performs a task in the background
+"""
 from pathlib import Path
 from typing import Optional
 
