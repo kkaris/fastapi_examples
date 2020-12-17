@@ -30,6 +30,8 @@ Todo:
    OR
    Celery:
    https://docs.celeryproject.org/en/stable/
+ - BUG: Status in final result is 'working', not 'finished', but the meta
+        data json has status 'finished'
 
 Try with:
 res = requests.post('http://127.0.0.1:8000/submit_job', json=<VALID JSON>)
