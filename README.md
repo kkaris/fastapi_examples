@@ -4,12 +4,17 @@ Assembles multiple FastAPI examples in one place
 ## Examples ToDo
 
 - [ ] When to do async endpoints and functions and when not to
-- [x] Background tasks
-- [x] Static file hosting (e.g. json files)
-- [x] How to separate out parameters (endpoint vs query vs json)
-- [x] Dependency injection
-- [ ] Separate sub-services for one service
-- [ ] 202-redirect + work in background
+- [x] Background tasks (see `examples/http_accepted/main.py`, 
+      `examples/background_tasks/background.py`, )
+- [x] Static file hosting (e.g. json files) (see 
+      `examples/static_files/static_file_hosting.py`,
+      `examples/http_accepted/main.py`)
+- [x] How to separate out parameters in endpoint vs query vs json (see 
+      `examples/request_mixing/mix_path_query_body.py`)
+- [x] Dependency injection (see `examples/background_tasks/background.py`, 
+      `examples/dependency_injection/dependency_injection.py`)
+- [ ] Separate service into sub-services
+- [ ] 202-redirect + work in background (see `examples/http_accepted/main.py`)
 - [ ] async file writing using [aiofiles](https://github.com/Tinche/aiofiles)
 - [ ] async requests using [aiohttp](https://github.com/aio-libs/aiohttp)
 - [ ]
