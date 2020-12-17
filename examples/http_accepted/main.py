@@ -30,8 +30,6 @@ Todo:
    OR
    Celery:
    https://docs.celeryproject.org/en/stable/
- - BUG: Status in final result is 'working', not 'finished', but the meta
-        data json has status 'finished'
 
 Try with:
 res = requests.post('http://127.0.0.1:8000/submit_job', json=<VALID JSON>)
@@ -167,7 +165,6 @@ def update_job_status(qh: str, from_status: str, to_status: str):
         assert job is not None
         job.status = to_status
         queues[to_status][qh] = job
-        upload_job_status(job)
     except AssertionError:
         raise JobStatusException(f'Could not find job {qh} in queue')
 
@@ -204,6 +201,7 @@ async def crunch_the_numbers(q: NetworkSearchQuery):
     # Update job status to 'working', check we actually got a job
     update_job_status(q_hash, 'pending', 'working')
     job, status = get_work_status(q_hash)
+    upload_job_status(job)
     await asyncio.sleep(randint(2, 30))
     # Create Result object
     res = Result(result_text='path found', number_of_paths=10,
@@ -213,11 +211,13 @@ async def crunch_the_numbers(q: NetworkSearchQuery):
     job.result = res
     # Get file name. This also sets `job.location`
     fname = job.get_fname()
+    # Update job status to 'finished', check we actually got a job
+    update_job_status(q_hash, 'working', 'finished')
     with DATA_DIR.joinpath(fname).open('w') as f:
         logger.info(f'Writing results to {DATA_DIR.joinpath(fname)}')
         json.dump(fp=f, obj=job.dict())
-    # Update job status to 'finished', check we actually got a job
-    update_job_status(q_hash, 'working', 'finished')
+    # Finally upload job status so client can see that results exist
+    upload_job_status(job)
     logger.info(f'Results served at {job.location}')
     logger.info(f'Job {q_hash} terminated successfully')
 
