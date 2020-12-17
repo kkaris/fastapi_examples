@@ -35,21 +35,29 @@ Try with:
 res = requests.post('http://127.0.0.1:8000/submit_job', json=<VALID JSON>)
 job_id = str(res.json()['id']) if res.status_code in [200, 202] else \
     res.status_code; print(job_id)
-res = requests.get(f'http://127.0.0.1:8000/data/{job_id}_result.json')
+res = requests.get(f'http://127.0.0.1:8000/data/{job_id}_meta.json')
 n = 1
 while res.status_code != 200:
     print(f'Got status {res.status_code}, waiting for {n} seconds')
     sleep(n)
-    res = requests.get(f'http://127.0.0.1:8000/data/{job_id}_result.json')
-    n *= 2
+    res = requests.get(f'http://127.0.0.1:8000/data/{job_id}_meta.json')
+    n *= 1.5
+n = 1
+while res.json()['status'] != 'finished':
+    print(f'Got job status "{res.json()["status"]}", waiting for {n} seconds')
+    sleep(n)
+    n *= 1.5
+    res = requests.get(f'http://127.0.0.1:8000/data/{job_id}_meta.json')
+res = requests.get(f'http://127.0.0.1:8000/data/{job_id}_result.json')
 print(res.json())
 
+
 Example output:
-Got status 404, waiting for 1 seconds
-Got status 404, waiting for 2 seconds
-Got status 404, waiting for 4 seconds
-{'result_text': 'path found', 'number_of_paths': 10, 'source': 'IRAK3',
-'target': 'EGFR'}
+2293633316
+Got job status "working", waiting for 1 seconds
+Got job status "working", waiting for 1.5 seconds
+Got job status "working", waiting for 2.25 seconds
+{'status': 'working', 'id': '2293633316', 'query': {'source': 'hello', 'target': 'HiTS', 'stmt_filter': None, 'edge_hash_blacklist': None, 'node_filter': None, 'node_blacklist': None, 'path_length': None, 'sign': None, 'weighted': None, 'bsco': None, 'curated_db_only': None, 'fplx_expand': None, 'k_shortest': None, 'max_per_node': None, 'cull_best_node': None, 'mesh_ids': None, 'strict_mesh_id_filtering': None, 'const_c': None, 'const_tk': None, 'user_timeout': None, 'two_way': None, 'shared_regulators': None, 'terminal_ns': None, 'format': None}, 'result': {'result_text': 'path found', 'number_of_paths': 10, 'source': 'hello', 'target': 'HiTS'}, 'fname': '2293633316_result.json', 'location': '/data/2293633316_result.json', 'meta_name': '2293633316_meta.json', 'meta_location': '/data/2293633316_meta.json'}
 
 
 As always, run with
@@ -104,12 +112,16 @@ class JobStatus(BaseModel):
     result: Result = None
     fname: str = None
     location: str = None
+    meta_name: str = None
+    meta_location: str = None
 
     def get_fname(self):
         """Get the file name for the query"""
         # Create file name
         if self.location is None:
             self.set_location()
+        if self.meta_name is None:
+            self.set_meta()
         return self.fname
 
     def _set_fname(self):
@@ -122,6 +134,11 @@ class JobStatus(BaseModel):
             self._set_fname()
         # Set job.location
         self.location = f'/data/{self.fname}'
+
+    def set_meta(self):
+        """Set self.meta_location"""
+        self.meta_name = f'{self.query.get_hash()}_meta.json'
+        self.meta_location = f'/data/{self.meta_name}'
 
 
 class JobStatusException(Exception):
@@ -148,8 +165,20 @@ def update_job_status(qh: str, from_status: str, to_status: str):
         assert job is not None
         job.status = to_status
         queues[to_status][qh] = job
+        upload_job_status(job)
     except AssertionError:
         raise JobStatusException(f'Could not find job {qh} in queue')
+
+
+def upload_job_status(job_status: JobStatus):
+    # Todo: make async
+    """Upload the current job status"""
+    # Set meta just to be safe
+    job_status.set_meta()
+    meta_name = job_status.meta_name
+    with DATA_DIR.joinpath(meta_name).open('w') as f:
+        logger.info(f'Writing results to {DATA_DIR.joinpath(meta_name)}')
+        json.dump(fp=f, obj=job_status.dict())
 
 
 def add_job(job: JobStatus):
@@ -157,6 +186,7 @@ def add_job(job: JobStatus):
     job.status = 'pending'
     qh = job.query.get_hash()
     queues['pending'][qh] = job
+    upload_job_status(job)
     logger.info(f'Added job {qh} to {job.status}')
 
 
@@ -179,7 +209,7 @@ async def crunch_the_numbers(q: NetworkSearchQuery):
     logger.info(f'Finished on job {q_hash}')
     # Update job.result
     job.result = res
-    # Get file name. This also set job.location
+    # Get file name. This also sets `job.location`
     fname = job.get_fname()
     with DATA_DIR.joinpath(fname).open('w') as f:
         logger.info(f'Writing results to {DATA_DIR.joinpath(fname)}')
