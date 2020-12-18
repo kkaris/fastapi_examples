@@ -9,7 +9,7 @@ Shared code is one use case, other use cases are e.g. shared database
 connections and enforcing security, authentication, role requirements, etc.
 
 From the docs:
-  To async or not to async?
+  To async or not to async *your dependencies*?
   As dependencies will also be called by FastAPI (the same as your path
   operation functions), the same rules apply while defining your functions.
 
@@ -18,6 +18,8 @@ From the docs:
   And you can declare dependencies with async def inside of normal def path
   operation functions, or def dependencies inside of async def path operation
   functions, etc.
+
+  It doesn't matter. FastAPI will know what to do.
 
 Run this as a server using uvicorn with:
 > uvicorn dependency_injection.dependency_injection:app --reload
