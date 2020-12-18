@@ -3,7 +3,8 @@ Assembles multiple FastAPI examples in one place
 
 ## Examples ToDo
 
-- [ ] When to do async endpoints and functions and when not to
+- [ ] When to do async endpoints and functions and when not to (see 
+      `examples/to_async_or_not_to_async/async_vs_sync.py`)
 - [x] Background tasks (see `examples/http_accepted/main.py`, 
       `examples/background_tasks/background.py`, )
 - [x] Static file hosting (e.g. json files) (see 
