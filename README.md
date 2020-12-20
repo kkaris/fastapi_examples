@@ -19,5 +19,7 @@ Assembles multiple FastAPI examples in one place
 - [x] async file writing using [aiofiles](https://github.com/Tinche/aiofiles) 
       (used in `examples/to_async_or_not_to_async/async_vs_sync.py`)
 - [ ] async requests using [aiohttp](https://github.com/aio-libs/aiohttp)
-- [ ] asyncio queue
+- [ ] asyncio queue (see the python 3.7
+      [docs](https://docs.python.org/3.7/library/asyncio-queue.html#asyncio-queues) 
+      for `asyncio.Queue`.)
 - [ ] 
