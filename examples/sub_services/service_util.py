@@ -3,6 +3,7 @@ This file contains helper functions and basemodels for the services
 """
 import json
 import logging
+import aiofiles
 from typing import Optional, Dict, List
 from pathlib import Path
 from pydantic import BaseModel
@@ -13,7 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 __all__ = ['NetworkSearchQuery', 'Job', 'JobStatus', 'ServiceStatus',
-           'Edge', 'PathResult', 'QueryResult', 'upload_json']
+           'Edge', 'PathResult', 'QueryResult', 'upload_json',
+           'upload_json_async']
 
 HERE = Path(__file__).parent
 DATA_DIR = HERE.parent.absolute().joinpath('data')
@@ -83,3 +85,13 @@ def upload_json(model: BaseModel, name: str):
     with DATA_DIR.joinpath(name).open('w') as f:
         logger.info(f'Writing to file {DATA_DIR.joinpath(name)}')
         json.dump(fp=f, obj=model.dict())
+
+
+async def upload_json_async(model: BaseModel, name: str):
+    """Dumps json to s3 for public read access"""
+    # Todo make async with aioboto3
+    # logger.info('Writing file')
+    # dump_json_to_s3(name, model.dict(), public=True)
+    async with aiofiles.open(DATA_DIR.joinpath(name), 'w') as f:
+        logger.info(f'Writing to file async {DATA_DIR.joinpath(name)}')
+        await f.write(json.dumps(model.dict()))
