@@ -29,4 +29,7 @@ These todos are roughly in order
 These ides could be implemented now or later, but are not necessary for the 
 minimal working example
 - [ ] Provide job status (at least pending/working) with mongodb?
-- [ ]
+- [ ] Use [aioboto3](https://github.com/terrycain/aioboto3) for async 
+      upload of S3 files. See also 
+      [aiobotocore](https://github.com/aio-libs/aiobotocore) and this
+      [how-to](https://medium.com/tysonworks/concurrency-with-boto3-41cfa300aab4)
