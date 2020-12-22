@@ -68,6 +68,13 @@ async def read_file_async(fname: str):
     return contents
 
 
+def read_file_blocking(fname: str):
+    """Reads file while blocking"""
+    with open(fname, 'r') as f:
+        contents = f.read()
+    return contents
+
+
 # This path operation function does not communicate with anything else,
 # and should therefore be async-ed
 @app.get('/adder')
