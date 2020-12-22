@@ -11,51 +11,38 @@ res = requests.post('http://127.0.0.1:8000/write-to-log?q=1234567890abcdef',
     json={'address': 'my@email.com', 'message': 'Hello FastAPI!'})
 
 """
-from time import sleep
-from typing import Optional
-from pathlib import Path
 from logging import getLogger
-from fastapi import BackgroundTasks, FastAPI, Depends
-# from .service_util import QueryBodySum
-from .service_util import WriteToLogQuery
+from fastapi import BackgroundTasks, FastAPI
+from .service_util import *
 
 app = FastAPI()
 
 logger = getLogger(__name__)
-HERE = Path(__file__).parent
-LOGFILE = HERE.joinpath('log.txt')
+
+# Initialize with 'booting' before we're done loading stuff
+STATUS = ServiceStatus(service_type='signed worker',
+                       status='booting')
 
 
-def write_to_log(message: str):
-    logger.info(f'Writing {message} to file {str(LOGFILE)}')
-    sleep(5)
-    with LOGFILE.open('a') as f:
-        f.write(message)
-    logger.info('Finished writing to logfile')
+@app.get('/health')
+async def health():
+    """Health endpoint"""
+    return {'status': STATUS.status}
 
 
-def get_query(background_tasks: BackgroundTasks, q: Optional[str] = None):
-    if q:
-        message = f'Found query {q}\n'
-        background_tasks.add_task(write_to_log, message)
-    return q
+@app.get('/status', response_model=ServiceStatus)
+async def status():
+    """Gives the current status of this service"""
+    return STATUS
 
 
-@app.post('/write-to-log')
-async def summation(query_params: WriteToLogQuery,
-                    background_tasks: BackgroundTasks,
-                    q: str = Depends(get_query)):
-    """Example of endpoint doing queries in the background
+@app.post('/query')
+async def query(search_query: NetworkSearchQuery,
+                bgt: BackgroundTasks):
+    # todo handle query and send to background, return 202 if everything
+    #  went OK
+    pass
 
-    email: str
-        Who to send an email to
-    background_tasks: BackgroundTasks
 
-    Returns
-    -------
-    Dict
-        Json of status
-    """
-    log = f'Message to {query_params.address}: {query_params.message} {q}\n'
-    background_tasks.add_task(write_to_log, log)
-    return {'message': 'Message written in background'}
+# Change to 'online' after everything is loaded
+STATUS.status = 'online'
