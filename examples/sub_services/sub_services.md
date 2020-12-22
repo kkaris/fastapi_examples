@@ -4,14 +4,15 @@ efficient
 
 ## ToDos
 These todos are roughly in order
-- [ ] BaseModels:
+- [X] BaseModels (see `service_util.py`):
   - [x] NetworkSearchQuery
-  - [ ] Job
-  - [ ] JobStatus
-  - [ ] Result
-  - [ ] ServiceMetaData (contains info about e.g. graph type, service type 
+  - [X] Job
+  - [X] JobStatus
+  - [X] Result
+    - [X] SubModels
+    - [ ] 
+  - [X] ServiceMetaData (contains info about e.g. graph type, service type 
         e.g. worker or public service)
-  - [ ]
 - [ ] Public service (ps) gets query from Client (C)
 - [ ] ps uploads meta json with `status: pending` status
 - [ ] ps sends job to correct worker (Wi)
