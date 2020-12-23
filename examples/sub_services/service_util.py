@@ -4,7 +4,7 @@ This file contains helper functions and basemodels for the services
 import json
 import logging
 import aiofiles
-from typing import Optional, Dict, List
+from typing import Optional, Dict, List, Union
 from pathlib import Path
 from pydantic import BaseModel
 from indra_depmap_service.util import get_query_hash, dump_json_to_s3
@@ -38,19 +38,22 @@ class NetworkSearchQuery(BaseModel):
         return get_query_hash(self.dict())
 
 
-class Job(BaseModel):
-    """Defines a job"""
-    status: str
-    id: str
-    query: NetworkSearchQuery
-
-
 class JobStatus(BaseModel):
-    """Jobstatus model providing META data"""
+    """Job status model providing META data"""
     status: str
     id: str
     fname: Optional[str] = None
     location: Optional[str] = None  # e.g. URL or s3 path
+    result_location: Optional[str] = None  # e.g. URL or s3 path
+    error: Optional[str] = None  # In case something went wrong
+
+
+class Job(BaseModel):
+    """Defines a job"""
+    id: str
+    status: str
+    query: NetworkSearchQuery
+    job_status: JobStatus
 
 
 # RESULT MODELS
@@ -74,24 +77,25 @@ class QueryResult(BaseModel):
     forward_paths: Optional[PathResult] = None
     backward_paths: Optional[PathResult] = None
     shared_targets: Optional[List[Edge]] = None
+    fname: Optional[str] = None
 
 
 # HELPER FUNCTIONS
-def upload_json(model: BaseModel, name: str):
+def upload_json(json_dict: Union[QueryResult, JobStatus]):
+    """Dumps json to s3 for public read access"""
+    # logger.info('Writing file')
+    # dump_json_to_s3(name, model.dict(), public=True)
+    with DATA_DIR.joinpath(json_dict.fname).open('w') as f:
+        logger.info(f'Writing to file {DATA_DIR.joinpath(json_dict.fname)}')
+        json.dump(fp=f, obj=json_dict.dict())
+
+
+async def upload_json_async(json_dict: Union[QueryResult, JobStatus]):
     """Dumps json to s3 for public read access"""
     # Todo make async with aioboto3
     # logger.info('Writing file')
     # dump_json_to_s3(name, model.dict(), public=True)
-    with DATA_DIR.joinpath(name).open('w') as f:
-        logger.info(f'Writing to file {DATA_DIR.joinpath(name)}')
-        json.dump(fp=f, obj=model.dict())
-
-
-async def upload_json_async(model: BaseModel, name: str):
-    """Dumps json to s3 for public read access"""
-    # Todo make async with aioboto3
-    # logger.info('Writing file')
-    # dump_json_to_s3(name, model.dict(), public=True)
-    async with aiofiles.open(DATA_DIR.joinpath(name), 'w') as f:
-        logger.info(f'Writing to file async {DATA_DIR.joinpath(name)}')
-        await f.write(json.dumps(model.dict()))
+    async with aiofiles.open(DATA_DIR.joinpath(json_dict.fname), 'w') as f:
+        logger.info(f'Writing to file async '
+                    f'{DATA_DIR.joinpath(json_dict.fname)}')
+        await f.write(json.dumps(json_dict.dict()))
