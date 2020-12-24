@@ -14,8 +14,9 @@ These todos are roughly in order
   - [X] ServiceMetaData (contains info about e.g. graph type, service type 
         e.g. worker or public service)
 - [ ] Public service (ps) gets query from Client (C)
-- [ ] ps uploads meta json with `status: pending` status
 - [ ] ps sends job to correct worker (Wi)
+- [ ] Wi uploads meta json with `status: pending` status
+- [ ] Wi responds with 202 to ps
 - [ ] ps responds with 202 to C
 - [ ] Wi updates meta json with `status: working`
 - [ ] Wi *either* runs job in background *or* runs blocking job
