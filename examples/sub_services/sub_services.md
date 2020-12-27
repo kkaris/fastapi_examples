@@ -3,7 +3,7 @@ The minimal working example for how to make the NetworkSearch API more
 efficient
 
 ## ToDos
-These todos are roughly in order
+### Requirements
 - [x] BaseModels (see `service_util.py`):
   - [x] NetworkSearchQuery
   - [x] Job
@@ -14,6 +14,9 @@ These todos are roughly in order
   - [x] ServiceMetaData (contains info about e.g. graph type, service type 
         e.g. worker or public service)
 - [ ] Public service finds the other services running
+- [ ] Decide how a worker knows its identity (unsigned or signed)
+### Request cycle
+These todos are roughly in order
 - [x] Public service (ps) gets query from Client (C)
 - [x] ps sends job to correct worker (Wi)
 - [x] Wi uploads meta json with `status: pending` status
