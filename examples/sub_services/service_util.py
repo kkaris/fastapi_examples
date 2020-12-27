@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 __all__ = ['NetworkSearchQuery', 'Job', 'JobStatus', 'ServiceStatus',
-           'Edge', 'PathResult', 'QueryResult', 'upload_json',
+           'Edge', 'PathResult', 'QueryResult', 'HealthStatus', 'upload_json',
            'upload_json_async']
 
 HERE = Path(__file__).parent
@@ -25,6 +25,13 @@ class ServiceStatus(BaseModel):
     """Service status model"""
     service_type: str  # Specify unsigned worker, signed worker, master etc
     status: str  # Specify available or loading or similar
+
+
+class HealthStatus(BaseModel):
+    """Health status model"""
+    unsigned_service: str
+    signed_service: str
+    public_api: str
 
 
 class NetworkSearchQuery(BaseModel):

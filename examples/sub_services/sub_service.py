@@ -61,15 +61,9 @@ def handle_query(nsq: NetworkSearchQuery, job_status: JobStatus):
     upload_json(job_status)
 
 
-@app.get('/health')
+@app.get('/health', response_model=ServiceStatus)
 async def health():
     """Health endpoint"""
-    return {'status': STATUS.status}
-
-
-@app.get('/status', response_model=ServiceStatus)
-async def status():
-    """Gives the current status of this service"""
     return STATUS
 
 
