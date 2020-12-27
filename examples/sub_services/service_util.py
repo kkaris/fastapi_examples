@@ -5,9 +5,9 @@ import json
 import logging
 import aiofiles
 from typing import Optional, Dict, List, Union
-from pathlib import Path
 from pydantic import BaseModel
 from indra_depmap_service.util import get_query_hash, dump_json_to_s3
+from . import DATA_DIR
 
 
 logger = logging.getLogger(__name__)
@@ -16,9 +16,6 @@ logger = logging.getLogger(__name__)
 __all__ = ['NetworkSearchQuery', 'Job', 'JobStatus', 'ServiceStatus',
            'Edge', 'PathResult', 'QueryResult', 'HealthStatus',
            'EMPTY_JOB_STATUS', 'upload_json', 'upload_json_async']
-
-HERE = Path(__file__).parent
-DATA_DIR = HERE.parent.absolute().joinpath('data')
 
 
 class ServiceStatus(BaseModel):

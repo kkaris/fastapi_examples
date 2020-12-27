@@ -11,15 +11,11 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from .service_util import *
+from . import DATA_DIR
 
 logger = logging.getLogger(__name__)
 app = FastAPI()
 
-# Set data directory
-HERE = Path(__file__).parent.absolute()  # This dir
-DATA_DIR = HERE.parent.joinpath('data')  # Directory in parent dir
-if not DATA_DIR.is_dir():
-    DATA_DIR.mkdir(parents=True)
 app.mount('/data', StaticFiles(directory=DATA_DIR.as_posix()), name='data')
 
 # Todo: find the workers and their status
