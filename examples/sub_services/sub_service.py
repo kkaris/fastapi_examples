@@ -35,10 +35,14 @@ edge3: Edge = Edge(hashes=[-192837465, 9081726354],
 
 
 def handle_query(nsq: NetworkSearchQuery, job_status: JobStatus):
-    """Simulate high work intensity with a sleep
+    """Respond to search query
 
-    Todo: run some CPU heavy loop doing nonsense to test the robustness
+    Simulate high workload with a sleep
+
+    Todo: run some CPU heavy nonsense loop to test the async robustness
     """
+    logger.info(f'Working on query {nsq.get_hash()}')
+
     # Update job status to 'working'
     job_status.status = 'working'
     upload_json(job_status)
@@ -48,11 +52,11 @@ def handle_query(nsq: NetworkSearchQuery, job_status: JobStatus):
     qr = QueryResult(forward_paths=pr, shared_targets=st)
     qr.fname = f'{nsq.get_hash()}_result.json'
 
-    # Simulate work that often takes less than one or a couple of seconds,
+    # Simulate work that often takes a couple of seconds or less,
     # but sometimes takes a lot longer
     sleep_time = rnd_exp(scale=7)
-    logger.info(f'Sleeping for {sleep_time}')
     sleep(sleep_time)
+    logger.info(f'Finished query {nsq.get_hash()}')
 
     # Upload results
     upload_json(qr)
