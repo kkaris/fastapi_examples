@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 
 
 __all__ = ['NetworkSearchQuery', 'Job', 'JobStatus', 'ServiceStatus',
-           'Edge', 'PathResult', 'QueryResult', 'HealthStatus', 'upload_json',
-           'upload_json_async']
+           'Edge', 'PathResult', 'QueryResult', 'HealthStatus',
+           'EMPTY_JOB_STATUS', 'upload_json', 'upload_json_async']
 
 HERE = Path(__file__).parent
 DATA_DIR = HERE.parent.absolute().joinpath('data')
@@ -53,6 +53,9 @@ class JobStatus(BaseModel):
     location: Optional[str] = None  # e.g. URL or s3 path
     result_location: Optional[str] = None  # e.g. URL or s3 path
     error: Optional[str] = None  # In case something went wrong
+
+
+EMPTY_JOB_STATUS = JobStatus(status='NA', id='NA')
 
 
 class Job(BaseModel):
