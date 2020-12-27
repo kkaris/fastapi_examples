@@ -2,12 +2,25 @@
 Example API that receives requests from the internet and delegates work to
 subservices
 """
+import logging
+from pathlib import Path
+
 import requests
 from fastapi import FastAPI, status as http_status
+from fastapi.responses import JSONResponse
+from fastapi.staticfiles import StaticFiles
+
 from .service_util import *
 
+logger = logging.getLogger(__name__)
 app = FastAPI()
 
+# Set data directory
+HERE = Path(__file__).parent.absolute()  # This dir
+DATA_DIR = HERE.parent.joinpath('data')  # Directory in parent dir
+if not DATA_DIR.is_dir():
+    DATA_DIR.mkdir(parents=True)
+app.mount('/data', StaticFiles(directory=DATA_DIR.as_posix()), name='data')
 
 # Todo: find the workers and their status
 WORKERS = {'signed': 'http://127.0.0.1:8001',
@@ -40,13 +53,24 @@ def health():
           status_code=http_status.HTTP_202_ACCEPTED,
           response_model=JobStatus)
 def query(search_query: NetworkSearchQuery):
-    # Decide which service the query should run to
+    """Query the service and relay to correct worker"""
+    # Decide which service the query should run to, the workers should
+    # respond with 202 after sending the job to the background
     if search_query.signed is None:
         # query unsigned worker
-        status = requests.post(WORKERS['unsigned'], json=search_query.json())
+        res = requests.post(WORKERS['unsigned'],
+                            json=search_query.json())
     else:
         # Query signed worker
-        status = requests.post(WORKERS['signed'], json=search_query.json())
+        res = requests.post(f'{WORKERS["signed"]}/query',
+                            json=search_query.json())
+
+    if res.status_code == 202:
+        return JobStatus(**res.json())
+    else:
+        logger.warning(f'Query responded with status code {res.status_code}')
+        return JSONResponse(status_code=res.status_code,
+                            content=EMPTY_JOB_STATUS)
 
 
 # Change to 'online' after everything is loaded
