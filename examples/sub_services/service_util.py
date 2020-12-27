@@ -73,7 +73,7 @@ class Edge(BaseModel):
 class PathResult(BaseModel):
     """Results for directed paths"""
     one_edge: Optional[List[Edge]] = None
-    two_edge: Optional[List[Edge, Edge]] = None
+    two_edge: Optional[List[Edge]] = None
 
 
 class QueryResult(BaseModel):
