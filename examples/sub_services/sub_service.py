@@ -11,6 +11,7 @@ res = requests.post('http://127.0.0.1:8000/write-to-log?q=1234567890abcdef',
     json={'address': 'my@email.com', 'message': 'Hello FastAPI!'})
 
 """
+import asyncio
 from time import sleep
 from numpy.random import exponential as rnd_exp
 from logging import getLogger
@@ -89,4 +90,6 @@ async def query(search_query: NetworkSearchQuery,
 
 
 # Change to 'online' after everything is loaded
+# Simulate some io heavy loading with asyncio.sleep e.g. loading indra graphs
+asyncio.sleep(5)
 STATUS.status = 'online'
