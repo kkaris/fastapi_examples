@@ -31,8 +31,10 @@ try:
         # 'multi_digraph_path': INDRA_MDG_CACHE if path.isfile(INDRA_MDG_CACHE)
         # else None,
         'multi_digraph': None,
-        'sign_edge_graph': INDRA_SEG if INDRA_SEG.is_file() else None,
-        'sign_node_graph': INDRA_SNG if INDRA_SNG.is_file() else None
+        'sign_edge_graph': INDRA_SEG.as_posix() if \
+        INDRA_SEG.is_file() else None,
+        'sign_node_graph': INDRA_SNG.as_posix() if \
+        INDRA_SNG.is_file() else None
     }
 except KeyError as err:
     raise KeyError(
