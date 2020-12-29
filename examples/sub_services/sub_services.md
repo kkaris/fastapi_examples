@@ -13,8 +13,7 @@ efficient
     - [ ] 
   - [x] ServiceMetaData (contains info about e.g. graph type, service type 
         e.g. worker or public service)
-- [ ] Public service finds the other services running
-- [ ] Decide how a worker knows its identity (unsigned or signed)
+- [x] Decide how a worker knows its identity (unsigned or signed)
 ### Request cycle
 These todos are roughly in order
 - [x] Public service (ps) gets query from Client (C)
