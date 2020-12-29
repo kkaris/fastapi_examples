@@ -2,6 +2,7 @@
 This file contains helper functions and basemodels for the services
 """
 import json
+import pickle
 import logging
 import aiofiles
 from typing import Optional, Dict, List, Union
@@ -15,7 +16,8 @@ logger = logging.getLogger(__name__)
 
 __all__ = ['NetworkSearchQuery', 'Job', 'JobStatus', 'ServiceStatus',
            'Edge', 'PathResult', 'QueryResult', 'HealthStatus',
-           'EMPTY_JOB_STATUS', 'upload_json', 'upload_json_async']
+           'EMPTY_JOB_STATUS', 'upload_json', 'upload_json_async',
+           'async_pickle_open']
 
 
 class ServiceStatus(BaseModel):
@@ -106,3 +108,12 @@ async def upload_json_async(json_dict: Union[QueryResult, JobStatus]):
         logger.info(f'Writing to file async '
                     f'{DATA_DIR.joinpath(json_dict.fname)}')
         await f.write(json.dumps(json_dict.json()))
+
+
+async def async_pickle_open(fname: str):
+    """async pickle load"""
+    logger.info(f'Loading pickle file {fname}')
+    async with aiofiles.open(fname, 'rb') as f:
+        obj = pickle.load(f)
+    logger.info('Finished loading pickle file')
+    return obj
