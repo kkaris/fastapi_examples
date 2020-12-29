@@ -5,20 +5,20 @@ as background tasks
 
 Run this as a server using uvicorn with:
 > uvicorn sub_services.sub_service:app --reload
-
-Test with requests
-res = requests.post('http://127.0.0.1:8000/write-to-log?q=1234567890abcdef',
-    json={'address': 'my@email.com', 'message': 'Hello FastAPI!'})
-
 """
 import asyncio
 from time import sleep
+from depmap_analysis.util.io_functions import file_opener
+from typing import Union, Optional
 from numpy.random import exponential as rnd_exp
+from networkx import DiGraph, MultiGraph
 from logging import getLogger
 from fastapi import BackgroundTasks, FastAPI, status as http_status
 from .service_util import *
+from . import WORKER_TYPE, FILES
 
 app = FastAPI()
+indra_graph: Optional[Union[DiGraph, MultiGraph]] = None
 
 logger = getLogger(__name__)
 
@@ -94,6 +94,10 @@ async def query(search_query: NetworkSearchQuery,
 
 
 # Change to 'online' after everything is loaded
-# Simulate some io heavy loading with asyncio.sleep e.g. loading indra graphs
-asyncio.sleep(5)
+# asyncio.sleep(5)  # Simulate loading something
+if WORKER_TYPE == 'UNSIGNED':
+    indra_graph = file_opener(FILES['dir_graph'].as_posix())
+elif WORKER_TYPE == 'SIGNED':
+    indra_seg = file_opener(FILES['sign_edge_graph'].as_posix())
+    indra_sng = file_opener(FILES['sign_node_graph'].as_posix())
 STATUS.status = 'online'
