@@ -15,7 +15,7 @@ from networkx import DiGraph, MultiGraph
 from logging import getLogger
 from fastapi import BackgroundTasks, FastAPI, status as http_status
 from .service_util import *
-from . import WORKER_TYPE, FILES
+from . import WORKER_ROLE, FILES
 
 app = FastAPI()
 indra_graph: Optional[Union[DiGraph, MultiGraph]] = None
@@ -23,7 +23,7 @@ indra_graph: Optional[Union[DiGraph, MultiGraph]] = None
 logger = getLogger(__name__)
 
 # Initialize with 'booting' before we're done loading stuff
-STATUS = ServiceStatus(service_type='signed worker',
+STATUS = ServiceStatus(service_type=WORKER_ROLE,
                        status='booting')
 
 edge1: Edge = Edge(hashes=[123456789, 987654321],
@@ -94,10 +94,16 @@ async def query(search_query: NetworkSearchQuery,
 
 
 # Change to 'online' after everything is loaded
-# asyncio.sleep(5)  # Simulate loading something
-if WORKER_TYPE == 'UNSIGNED':
-    indra_graph = file_opener(FILES['dir_graph'].as_posix())
-elif WORKER_TYPE == 'SIGNED':
-    indra_seg = file_opener(FILES['sign_edge_graph'].as_posix())
-    indra_sng = file_opener(FILES['sign_node_graph'].as_posix())
+# asyncio.sleep(5)  # Simulate loading something <- not allowed, can't await
+# outside async function
+if WORKER_ROLE == 'UNSIGNED':
+    logger.info('Assuming role as unsigned worker')
+    indra_graph = async_pickle_open(FILES['dir_graph'])
+elif WORKER_ROLE == 'SIGNED':
+    logger.info('Assuming role as signed worker')
+    indra_seg = async_pickle_open(FILES['sign_edge_graph'])
+    indra_sng = async_pickle_open(FILES['sign_node_graph'])
+else:
+    logger.warning('No worker role assigned, not loading graph')
+logger.info('Finished loading graphs, ready for work')
 STATUS.status = 'online'

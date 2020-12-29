@@ -11,16 +11,16 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from .service_util import *
-from . import DATA_DIR
+from . import DATA_DIR, SERVICE_PORTS, WORKER_ROLE
 
 logger = logging.getLogger(__name__)
 app = FastAPI()
 
 app.mount('/data', StaticFiles(directory=DATA_DIR.as_posix()), name='data')
 
-# Todo: find the workers and their status
-WORKERS = {'signed': 'http://127.0.0.1:8001',
-           'unsigned': 'http://127.0.0.1:8002'}
+STATUS = ServiceStatus(service_type=WORKER_ROLE, status='booting')
+HEALTH: HealthStatus = HealthStatus()
+
 
 
 STATUS = ServiceStatus(service_type='public api', status='booting')

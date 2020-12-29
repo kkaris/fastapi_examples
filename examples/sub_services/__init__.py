@@ -11,10 +11,10 @@ else:
 if not DATA_DIR.is_dir():
     DATA_DIR.mkdir(parents=True)
 
-
 # Set service configs
 try:
-    WORKER_TYPE = environ['WORKER_TYPE']  # Sets the identity of the service
+    WORKER_ROLE = environ['WORKER_ROLE']  # Sets the identity of the service
+    assert WORKER_ROLE in {'UNSIGNED', 'SIGNED', 'PUBLIC_API'}
     public_port = environ['MAIN_PORT']
     signed_port = environ['SIGNED_PORT']
     unsigned_port = environ['UNSIGNED_PORT']
