@@ -23,8 +23,8 @@ indra_graph: Optional[Union[DiGraph, MultiGraph]] = None
 logger = getLogger(__name__)
 
 # Initialize with 'booting' before we're done loading stuff
-STATUS = ServiceStatus(service_type=WORKER_ROLE,
-                       status='booting')
+STATUS: ServiceStatus = ServiceStatus(service_type=WORKER_ROLE,
+                                      status='booting')
 
 edge1: Edge = Edge(hashes=[123456789, 987654321],
                    sources={'reach': 5, 'xdd': 3, 'tas': 2})
