@@ -22,9 +22,9 @@ try:
     public_port = environ['MAIN_PORT']
     signed_port = environ['SIGNED_PORT']
     unsigned_port = environ['UNSIGNED_PORT']
-    SERVICE_PORTS = {'public': f'http://127.0.0.1:{public_port}',
-                     'signed': f'http://127.0.0.1:{signed_port}',
-                     'unsigned': f'http://127.0.0.1:{unsigned_port}'}
+    SERVICE_URLS = {'public': f'http://127.0.0.1:{public_port}',
+                    'signed': f'http://127.0.0.1:{signed_port}',
+                    'unsigned': f'http://127.0.0.1:{unsigned_port}'}
     graph_dir = Path(environ['GRAPH_DIR']).absolute()
     INDRA_MDG = graph_dir.joinpath('indranet_multi_digraph_latest.pkl')
     INDRA_DG = graph_dir.joinpath('indranet_dir_graph_latest.pkl')

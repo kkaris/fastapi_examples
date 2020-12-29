@@ -6,12 +6,13 @@ import logging
 from pathlib import Path
 
 import requests
+from requests.exceptions import ConnectionError
 from fastapi import FastAPI, status as http_status
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from .service_util import *
-from . import DATA_DIR, SERVICE_PORTS, WORKER_ROLE
+from . import DATA_DIR, SERVICE_URLS, WORKER_ROLE
 
 logger = logging.getLogger(__name__)
 app = FastAPI()
@@ -22,8 +23,25 @@ STATUS = ServiceStatus(service_type=WORKER_ROLE, status='booting')
 HEALTH: HealthStatus = HealthStatus()
 
 
+def _set_health_status():
+    # Todo: run async when you get a grip on aiohttp
+    global HEALTH
+    try:
+        res = requests.get(f'{SERVICE_URLS["unsigned"]}/health')
+        unsigned_health = res.json().get('status', 'offline') if \
+            res.status_code == 200 else 'offline'
+    except (ConnectionError, AttributeError):
+        unsigned_health = 'offline'
+    try:
+        res = requests.get(f'{SERVICE_URLS["signed"]}/health')
+        signed_health = res.json().get('status', 'offline') if \
+            res.status_code == 200 else 'offline'
+    except (ConnectionError, AttributeError):
+        signed_health = 'offline'
 
-STATUS = ServiceStatus(service_type='public api', status='booting')
+    HEALTH = HealthStatus(unsigned_service=unsigned_health,
+                          signed_service=signed_health,
+                          public_api=STATUS.status)
 
 
 @app.get('/public_health', response_model=ServiceStatus)
@@ -35,14 +53,8 @@ async def public_health():
 @app.get('/health', response_model=HealthStatus)
 def health():
     """Returns health of this service and the workers"""
-    # Todo: poll the workers for their status, do so asynchronously when you
-    #  get a grip on aiohttp
-    unsigned_health = requests.get(f'{WORKERS["unsigned"]}/health').json()
-    signed_health = requests.get(f'{WORKERS["signed"]}/health').json()
-    hs = HealthStatus(unsigned_service=unsigned_health['status'],
-                      signed_service=signed_health['stats'],
-                      public_api=STATUS.status)
-    return hs
+    _set_health_status()  # Run async when updated to async
+    return HEALTH
 
 
 @app.post('/query',
@@ -54,11 +66,11 @@ def query(search_query: NetworkSearchQuery):
     # respond with 202 after sending the job to the background
     if search_query.signed is None:
         # query unsigned worker
-        res = requests.post(WORKERS['unsigned'],
+        res = requests.post(f'{SERVICE_URLS["unsigned"]}/query',
                             json=search_query.json())
     else:
         # Query signed worker
-        res = requests.post(f'{WORKERS["signed"]}/query',
+        res = requests.post(f'{SERVICE_URLS["signed"]}/query',
                             json=search_query.json())
 
     if res.status_code == 202:
