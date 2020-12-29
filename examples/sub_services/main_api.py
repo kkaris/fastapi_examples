@@ -6,6 +6,7 @@ import logging
 from pathlib import Path
 
 import requests
+from typing import Optional
 from requests.exceptions import ConnectionError
 from fastapi import FastAPI, status as http_status
 from fastapi.responses import JSONResponse
@@ -20,7 +21,7 @@ app = FastAPI()
 app.mount('/data', StaticFiles(directory=DATA_DIR.as_posix()), name='data')
 
 STATUS = ServiceStatus(service_type=WORKER_ROLE, status='booting')
-HEALTH: HealthStatus = HealthStatus()
+HEALTH: Optional[HealthStatus] = None
 
 
 def _set_health_status():
