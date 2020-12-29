@@ -67,7 +67,7 @@ class Job(BaseModel):
 class Edge(BaseModel):
     """The smallest unit of result"""
     hashes: List[int]
-    sources: List[Dict[str, int]]
+    sources: Dict[str, int]
 
 
 class PathResult(BaseModel):
