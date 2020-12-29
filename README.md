@@ -16,7 +16,7 @@ Assembles multiple FastAPI examples in one place
       `examples/dependency_injection/dependency_injection.py`)
 - [ ] Separate service into sub-services
 - [ ] 202-redirect + work in background (see `examples/http_accepted/main.py`)
-- [x] async file writing using [aiofiles](https://github.com/Tinche/aiofiles) 
+- [x] async file io using [aiofiles](https://github.com/Tinche/aiofiles) 
       (used in `examples/to_async_or_not_to_async/async_vs_sync.py`)
 - [ ] async requests using [aiohttp](https://github.com/aio-libs/aiohttp)
 - [ ]
