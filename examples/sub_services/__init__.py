@@ -1,5 +1,8 @@
+import logging
 from os import environ
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
 
 # Set data directory
 if environ.get('DATA_DIR'):
@@ -9,6 +12,7 @@ else:
     DATA_DIR = HERE.parent.joinpath('data')  # Directory in parent dir
 
 if not DATA_DIR.is_dir():
+    logger.info(f'Data dir {DATA_DIR} does not exist, creating...')
     DATA_DIR.mkdir(parents=True)
 
 # Set service configs
