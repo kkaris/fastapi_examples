@@ -112,8 +112,8 @@ async def upload_json_async(json_dict: Union[QueryResult, JobStatus]):
 
 async def async_pickle_open(fname: str):
     """async pickle load"""
-    logger.info(f'Loading pickle file {fname}')
+    logger.info(f'Loading pickle file {fname} async')
     async with aiofiles.open(fname, 'rb') as f:
         obj = pickle.load(f)
-    logger.info('Finished loading pickle file')
+    logger.info('Finished loading pickle file async')
     return obj
