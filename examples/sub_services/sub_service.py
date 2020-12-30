@@ -24,7 +24,8 @@ logger = getLogger(__name__)
 
 # Initialize with 'booting' before we're done loading stuff
 STATUS: ServiceStatus = ServiceStatus(service_type=WORKER_ROLE,
-                                      status='booting')
+                                      status='booting',
+                                      graph_stats={})
 
 edge1: Edge = Edge(hashes=[123456789, 987654321],
                    sources={'reach': 5, 'xdd': 3, 'tas': 2})
@@ -98,11 +99,23 @@ async def query(search_query: NetworkSearchQuery,
 # outside async function
 if WORKER_ROLE == 'UNSIGNED':
     logger.info('Assuming role as unsigned worker')
-    indra_graph = async_pickle_open(FILES['dir_graph'])
+    indra_graph = file_opener(FILES['dir_graph']) if FILES['dir_graph'] else\
+        None
+    if isinstance(indra_graph, (DiGraph, MultiGraph)):
+        STATUS.graph_stats['unsigned_edges'] = len(indra_graph.edges)
+        STATUS.graph_stats['unsigned_nodes'] = len(indra_graph.nodes)
 elif WORKER_ROLE == 'SIGNED':
     logger.info('Assuming role as signed worker')
-    indra_seg = async_pickle_open(FILES['sign_edge_graph'])
-    indra_sng = async_pickle_open(FILES['sign_node_graph'])
+    indra_seg = file_opener(FILES['sign_edge_graph']) if FILES[
+        'sign_edge_graph'] else None
+    if isinstance(indra_seg, (DiGraph, MultiGraph)):
+        STATUS.graph_stats['signed_edge_edges'] = len(indra_seg.edges)
+        STATUS.graph_stats['signed_edge_nodes'] = len(indra_seg.nodes)
+    indra_sng = file_opener(FILES['sign_node_graph']) if indra_seg and \
+        FILES['sign_node_graph'] else None
+    if isinstance(indra_sng, (DiGraph, MultiGraph)):
+        STATUS.graph_stats['signed_node_edges'] = len(indra_sng.edges)
+        STATUS.graph_stats['signed_node_nodes'] = len(indra_sng.nodes)
 else:
     logger.warning('No worker role assigned, not loading graph')
 logger.info('Finished loading graphs, ready for work')

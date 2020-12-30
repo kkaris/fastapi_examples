@@ -24,6 +24,7 @@ class ServiceStatus(BaseModel):
     """Service status model"""
     service_type: str  # Specify unsigned worker, signed worker, master etc
     status: str  # Specify available or loading or similar
+    graph_stats: Optional[Dict[str, int]] = None
 
 
 class HealthStatus(BaseModel):
