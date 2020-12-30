@@ -38,7 +38,7 @@ class NetworkSearchQuery(BaseModel):
     """Small version of final NetworkSearchQuery"""
     source: str
     target: Optional[str]
-    signed: Optional[int] = None
+    signed: Optional[str] = None
 
     def get_hash(self):
         """Get the corresponding query hash of the query"""
