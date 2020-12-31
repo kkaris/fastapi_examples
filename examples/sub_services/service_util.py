@@ -97,7 +97,7 @@ def upload_json(json_dict: Union[QueryResult, JobStatus]):
     # dump_json_to_s3(name, model.dict(), public=True)
     with DATA_DIR.joinpath(json_dict.fname).open('w') as f:
         logger.info(f'Writing to file {DATA_DIR.joinpath(json_dict.fname)}')
-        json.dump(fp=f, obj=json_dict.json())
+        json.dump(fp=f, obj=json_dict.dict())
 
 
 async def upload_json_async(json_dict: Union[QueryResult, JobStatus]):
@@ -108,7 +108,7 @@ async def upload_json_async(json_dict: Union[QueryResult, JobStatus]):
     async with aiofiles.open(DATA_DIR.joinpath(json_dict.fname), 'w') as f:
         logger.info(f'Writing to file async '
                     f'{DATA_DIR.joinpath(json_dict.fname)}')
-        await f.write(json.dumps(json_dict.json()))
+        await f.write(json.dumps(json_dict.dict()))
 
 
 async def async_pickle_open(fname: str):

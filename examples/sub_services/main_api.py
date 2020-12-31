@@ -65,21 +65,22 @@ def query(search_query: NetworkSearchQuery):
     """Query the service and relay to correct worker"""
     # Decide which service the query should run to, the workers should
     # respond with 202 after sending the job to the background
+    logger.info(f'Got networksearchquery: {search_query.dict()}')
     if search_query.signed is None:
         # query unsigned worker
         res = requests.post(f'{SERVICE_URLS["unsigned"]}/query',
-                            json=search_query.json())
+                            json=search_query.dict())
     else:
         # Query signed worker
         res = requests.post(f'{SERVICE_URLS["signed"]}/query',
-                            json=search_query.json())
+                            json=search_query.dict())
 
     if res.status_code == 202:
         return JobStatus(**res.json())
     else:
         logger.warning(f'Query responded with status code {res.status_code}')
         return JSONResponse(status_code=res.status_code,
-                            content=EMPTY_JOB_STATUS)
+                            content=EMPTY_JOB_STATUS.dict())
 
 
 # Change to 'online' after everything is loaded
