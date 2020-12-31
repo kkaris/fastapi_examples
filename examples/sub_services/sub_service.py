@@ -45,6 +45,7 @@ def handle_query(nsq: NetworkSearchQuery, job_status: JobStatus):
     logger.info(f'Working on query {nsq.get_hash()}')
 
     # Update job status to 'working'
+    logger.info(f'Updating {nsq.get_hash()} to working')
     job_status.status = 'working'
     upload_json(job_status)
 
@@ -63,6 +64,7 @@ def handle_query(nsq: NetworkSearchQuery, job_status: JobStatus):
     upload_json(qr)
 
     # Update job status
+    logger.info(f'Updating {nsq.get_hash()} to done')
     job_status.status = 'done'
     upload_json(job_status)
 
@@ -89,6 +91,7 @@ async def query(search_query: NetworkSearchQuery,
                            status='pending',
                            fname=meta_name,
                            location=meta_loc)
+    logger.info(f'Updating {search_query.get_hash()} to pending')
     bgt.add_task(upload_json, job_status)
     bgt.add_task(handle_query, search_query, job_status)
     return job_status
