@@ -66,7 +66,7 @@ def query(search_query: NetworkSearchQuery):
     # Decide which service the query should run to, the workers should
     # respond with 202 after sending the job to the background
     logger.info(f'Got networksearchquery: {search_query.dict()}')
-    if search_query.signed is None:
+    if search_query.sign is None:
         # query unsigned worker
         res = requests.post(f'{SERVICE_URLS["unsigned"]}/query',
                             json=search_query.dict())
