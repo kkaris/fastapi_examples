@@ -9,6 +9,7 @@ Run this as a server using uvicorn with:
 import asyncio
 from time import sleep
 from depmap_analysis.util.io_functions import file_opener
+from depmap_analysis.network_functions.indra_network import IndraNetwork
 from typing import Union, Optional
 from numpy.random import exponential as rnd_exp
 from networkx import DiGraph, MultiGraph
@@ -18,7 +19,7 @@ from .service_util import *
 from . import WORKER_ROLE, FILES
 
 app = FastAPI()
-indra_graph: Optional[Union[DiGraph, MultiGraph]] = None
+network_search_api: Optional[IndraNetwork] = None
 
 logger = getLogger(__name__)
 
@@ -49,9 +50,10 @@ def handle_query(nsq: NetworkSearchQuery, job_status: JobStatus):
     job_status.status = 'working'
     upload_json(job_status)
 
-    pr = PathResult(one_edge=[edge1], two_edge=[edge2, edge3])
-    st = [edge1, edge2]
-    qr = QueryResult(forward_paths=pr, shared_targets=st)
+    # pr = PathResult(one_edge=[edge1], two_edge=[edge2, edge3])
+    # st = [edge1, edge2]
+    # qr = QueryResult(forward_paths=pr, shared_targets=st)
+    qr = network_search_api.handle_query(**nsq.dict())
     qr.fname = f'{nsq.get_hash()}_result.json'
 
     # Simulate work that often takes a couple of seconds or less,
@@ -107,6 +109,7 @@ if WORKER_ROLE == 'UNSIGNED':
     if isinstance(indra_graph, (DiGraph, MultiGraph)):
         STATUS.graph_stats['unsigned_edges'] = len(indra_graph.edges)
         STATUS.graph_stats['unsigned_nodes'] = len(indra_graph.nodes)
+        network_search_api = IndraNetwork(indra_dir_graph=indra_graph)
 elif WORKER_ROLE == 'SIGNED':
     logger.info('Assuming role as signed worker')
     indra_seg = file_opener(FILES['sign_edge_graph']) if FILES[
@@ -119,6 +122,8 @@ elif WORKER_ROLE == 'SIGNED':
     if isinstance(indra_sng, (DiGraph, MultiGraph)):
         STATUS.graph_stats['signed_node_edges'] = len(indra_sng.edges)
         STATUS.graph_stats['signed_node_nodes'] = len(indra_sng.nodes)
+        network_search_api = IndraNetwork(indra_sign_edge_graph=indra_seg,
+                                          indra_sign_node_graph=indra_sng)
 else:
     logger.warning('No worker role assigned, not loading graph')
 logger.info('Finished loading graphs, ready for work')
