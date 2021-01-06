@@ -28,12 +28,12 @@ STATUS: ServiceStatus = ServiceStatus(service_type=WORKER_ROLE,
                                       status='booting',
                                       graph_stats={})
 
-edge1: Edge = Edge(hashes=[123456789, 987654321],
-                   sources={'reach': 5, 'xdd': 3, 'tas': 2})
-edge2: Edge = Edge(hashes=[-123456789, -987654321],
-                   sources={'sparser': 5, 'tas': 3})
-edge3: Edge = Edge(hashes=[-192837465, 9081726354],
-                   sources={'tas': 1, 'drugbank': 1})
+# edge1: Edge = Edge(hashes=[123456789, 987654321],
+#                    sources={'reach': 5, 'xdd': 3, 'tas': 2})
+# edge2: Edge = Edge(hashes=[-123456789, -987654321],
+#                    sources={'sparser': 5, 'tas': 3})
+# edge3: Edge = Edge(hashes=[-192837465, 9081726354],
+#                    sources={'tas': 1, 'drugbank': 1})
 
 
 def handle_query(nsq: NetworkSearchQuery, job_status: JobStatus):
