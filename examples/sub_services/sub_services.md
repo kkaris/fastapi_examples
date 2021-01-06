@@ -14,6 +14,9 @@ efficient
   - [x] ServiceMetaData (contains info about e.g. graph type, service type 
         e.g. worker or public service)
 - [x] Decide how a worker knows its identity (unsigned or signed)
+- [x] Models for NetworkSearch results (try putting a result in the model)
+- [ ]
+
 ### Request cycle
 These todos are roughly in order
 - [x] Public service (ps) gets query from Client (C)
