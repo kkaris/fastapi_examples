@@ -51,6 +51,7 @@ def handle_query(nsq: NetworkSearchQuery, job_status: JobStatus):
     qr = network_search_api.handle_query(**nsq.dict())
     # todo: in the future, we expect a BaseModel to come out here
     qrm: QueryResult = QueryResult(**qr)
+    qrm.query_hash = nsq.get_hash()
     qrm.fname = f'{nsq.get_hash()}_result.json'
 
     # Simulate work that often takes a couple of seconds or less,

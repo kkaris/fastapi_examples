@@ -167,7 +167,7 @@ class QueryResult(BaseModel):
     This model contains the search results and also meta data
     All parameters are optional to account for empty results
     """
-    query_hash: str
+    query_hash: Optional[str] = None
     path_hashes: Optional[List[str]] = None
     result: Optional[SearchResults] = None
     fname: Optional[str] = None
