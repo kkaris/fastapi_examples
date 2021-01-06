@@ -61,7 +61,7 @@ def handle_query(nsq: NetworkSearchQuery, job_status: JobStatus):
     logger.info(f'Finished query {nsq.get_hash()}')
 
     # Upload results
-    upload_json(qr)
+    upload_json(qrm)
 
     # Update job status
     logger.info(f'Updating {nsq.get_hash()} to done')
