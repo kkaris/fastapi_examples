@@ -5,7 +5,7 @@ import json
 import pickle
 import logging
 import aiofiles
-from typing import Optional, Dict, List, Union
+from typing import Optional, Dict, List, Union, Tuple
 from pydantic import BaseModel
 from indra_depmap_service.util import NetworkSearchQuery
 from . import DATA_DIR
@@ -135,19 +135,30 @@ class KShortest(BaseModel):
     """Result for k-shortest paths keyed by path length
     Todo add method for filling out path_hashes??
     """
-    forward: Optional[Dict[str, List[PathResult]]] = None
-    backward: Optional[Dict[str, List[PathResult]]] = None
-    path_hashes: List[str]
+    forward: Optional[Dict[str, List[PathResult]]] = {}
+    backward: Optional[Dict[str, List[PathResult]]] = {}
+    path_hashes: Optional[List[str]] = []
+
+
+class CommonParents(BaseModel):
+    """Result for common parents search"""
+    source_ns: str
+    source_id: str
+    target_ns: str
+    target_id: str
+    common_parents: Optional[List[Tuple[str]]] = []
 
 
 class SearchResults(BaseModel):
     """Search results"""
     paths_by_node_count: KShortest
-    common_targets: List
-    shared_regulators: Optional[List] = None
-    common_parents: List
+    common_targets: Optional[
+        List[Dict[str, Union[float, List[List[Edge]]]]]] = []
+    shared_regulators: Optional[
+        List[Dict[str, Union[float, List[List[Edge]]]]]] = []
+    common_parents: Optional[CommonParents] = {}
     timeout: bool = False
-    node_not_found: Optional[str] = None
+    node_not_found: Union[str, bool] = False
 
 
 class QueryResult(BaseModel):
