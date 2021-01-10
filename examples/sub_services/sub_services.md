@@ -3,6 +3,11 @@ The minimal working example for how to make the NetworkSearch API more
 efficient
 
 ## ToDos
+### Bugs/fixes
+- [x] No results in result json (check what comes out of the search vs the 
+  model used to store the results)
+- [ ] EdgeModel currently has all the 
+
 ### Requirements
 - [x] BaseModels (see `service_util.py`):
   - [x] NetworkSearchQuery
@@ -31,6 +36,12 @@ These todos are roughly in order
 - [ ] (**If blocking job:** respond to ps with 200)
 - [x] **If background job:** no response to ps
 - [ ]
+
+### Test
+These things need to be tested:
+- [ ] LvL1: Ping server with health requests while a query comes in
+- [ ] LvL2: Ping server health, do weighted search that takes long time, 
+      submit second request as weighted search is ongoing
 
 ## Potential stuff
 These ides could be implemented now or later, but are not necessary for the 
