@@ -48,9 +48,11 @@ def handle_query(nsq: NetworkSearchQuery, job_status: JobStatus):
     # pr = PathResult(one_edge=[edge1], two_edge=[edge2, edge3])
     # st = [edge1, edge2]
     # qr = QueryResult(forward_paths=pr, shared_targets=st)
-    qr = network_search_api.handle_query(**nsq.dict())
-    # todo: in the future, we expect a BaseModel to come out here
-    qrm: QueryResult = QueryResult(**qr)
+    sr: SearchResults = network_search_api.handle_query(**nsq.dict())
+    qrm: QueryResult = QueryResult(
+        result=sr,
+        path_hashes=sr.paths_by_node_count.path_hashes
+    )
     qrm.query_hash = nsq.get_hash()
     qrm.fname = f'{nsq.get_hash()}_result.json'
 
