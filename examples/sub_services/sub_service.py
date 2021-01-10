@@ -15,8 +15,7 @@ from numpy.random import exponential as rnd_exp
 from networkx import DiGraph, MultiGraph
 from logging import getLogger
 from fastapi import BackgroundTasks, FastAPI, status as http_status
-from .service_util import *
-from . import WORKER_ROLE, FILES
+from . import *
 
 app = FastAPI()
 network_search_api: Optional[IndraNetwork] = None

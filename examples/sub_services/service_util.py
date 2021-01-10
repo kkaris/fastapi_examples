@@ -5,20 +5,30 @@ import json
 import pickle
 import logging
 import aiofiles
+from os import environ
 from typing import Optional, Dict, List, Union, Tuple
+from pathlib import Path
 from pydantic import BaseModel
 from indra_depmap_service.util import NetworkSearchQuery
-from . import DATA_DIR
-
-
-logger = logging.getLogger(__name__)
-
 
 __all__ = ['NetworkSearchQuery', 'Job', 'JobStatus', 'ServiceStatus',
            'Edge', 'PathResult', 'QueryResult', 'HealthStatus',
-           'EMPTY_JOB_STATUS', 'upload_json', 'upload_json_async',
-           'async_pickle_open', 'StmtInfo', 'SearchResults',
-           'CommonParents', 'KShortest']
+           'EMPTY_JOB_STATUS', 'StmtInfo', 'SearchResults', 'CommonParents',
+           'KShortest', 'upload_json', 'upload_json_async',
+           'async_pickle_open', 'FASTAPI_DATA_DIR']
+
+logger = logging.getLogger(__name__)
+
+# Set data directory
+if environ.get('DATA_DIR'):
+    FASTAPI_DATA_DIR = Path(environ['DATA_DIR']).absolute()
+else:
+    HERE = Path(__file__).parent.absolute()  # This dir
+    FASTAPI_DATA_DIR = HERE.parent.joinpath('data')  # Directory in parent dir
+
+if not FASTAPI_DATA_DIR.is_dir():
+    logger.info(f'Data dir {FASTAPI_DATA_DIR} does not exist, creating...')
+    FASTAPI_DATA_DIR.mkdir(parents=True)
 
 
 class ServiceStatus(BaseModel):
@@ -179,8 +189,8 @@ def upload_json(json_dict: Union[QueryResult, JobStatus]):
     """Dumps json to s3 for public read access"""
     # logger.info('Writing file')
     # dump_json_to_s3(name, model.dict(), public=True)
-    with DATA_DIR.joinpath(json_dict.fname).open('w') as f:
-        logger.info(f'Writing to file {DATA_DIR.joinpath(json_dict.fname)}')
+    with FASTAPI_DATA_DIR.joinpath(json_dict.fname).open('w') as f:
+        logger.info(f'Writing to file {FASTAPI_DATA_DIR.joinpath(json_dict.fname)}')
         json.dump(fp=f, obj=json_dict.dict())
 
 
@@ -189,9 +199,9 @@ async def upload_json_async(json_dict: Union[QueryResult, JobStatus]):
     # Todo make async with aioboto3
     # logger.info('Writing file')
     # dump_json_to_s3(name, model.dict(), public=True)
-    async with aiofiles.open(DATA_DIR.joinpath(json_dict.fname), 'w') as f:
+    async with aiofiles.open(FASTAPI_DATA_DIR.joinpath(json_dict.fname), 'w') as f:
         logger.info(f'Writing to file async '
-                    f'{DATA_DIR.joinpath(json_dict.fname)}')
+                    f'{FASTAPI_DATA_DIR.joinpath(json_dict.fname)}')
         await f.write(json.dumps(json_dict.dict()))
 
 

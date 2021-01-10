@@ -1,19 +1,15 @@
 import logging
 from os import environ
 from pathlib import Path
+from .service_util import *
+
+__all__ = ['WORKER_ROLE', 'FILES', 'upload_json', 'upload_json_async',
+           'async_pickle_open', 'NetworkSearchQuery', 'Job', 'JobStatus',
+           'ServiceStatus', 'Edge', 'PathResult', 'QueryResult',
+           'HealthStatus', 'EMPTY_JOB_STATUS', 'StmtInfo', 'SearchResults',
+           'CommonParents', 'KShortest', 'FASTAPI_DATA_DIR', 'SERVICE_URLS']
 
 logger = logging.getLogger(__name__)
-
-# Set data directory
-if environ.get('DATA_DIR'):
-    DATA_DIR = Path(environ['DATA_DIR']).absolute()
-else:
-    HERE = Path(__file__).parent.absolute()  # This dir
-    DATA_DIR = HERE.parent.joinpath('data')  # Directory in parent dir
-
-if not DATA_DIR.is_dir():
-    logger.info(f'Data dir {DATA_DIR} does not exist, creating...')
-    DATA_DIR.mkdir(parents=True)
 
 # Set service configs
 try:

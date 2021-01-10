@@ -11,14 +11,13 @@ from requests.exceptions import ConnectionError
 from fastapi import FastAPI, status as http_status
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
-
-from .service_util import *
-from . import DATA_DIR, SERVICE_URLS, WORKER_ROLE
+from . import *
 
 logger = logging.getLogger(__name__)
 app = FastAPI()
 
-app.mount('/data', StaticFiles(directory=DATA_DIR.as_posix()), name='data')
+app.mount('/data', StaticFiles(directory=FASTAPI_DATA_DIR.as_posix()),
+          name='data')
 
 STATUS = ServiceStatus(service_type=WORKER_ROLE, status='booting')
 HEALTH: Optional[HealthStatus] = None
