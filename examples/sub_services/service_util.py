@@ -17,7 +17,8 @@ logger = logging.getLogger(__name__)
 __all__ = ['NetworkSearchQuery', 'Job', 'JobStatus', 'ServiceStatus',
            'Edge', 'PathResult', 'QueryResult', 'HealthStatus',
            'EMPTY_JOB_STATUS', 'upload_json', 'upload_json_async',
-           'async_pickle_open']
+           'async_pickle_open', 'StmtInfo', 'SearchResults',
+           'CommonParents', 'KShortest']
 
 
 class ServiceStatus(BaseModel):
@@ -83,7 +84,7 @@ class Edge(BaseModel):
     """The basic edge info
 
     Todo: restructure the statement info keys to not be the name of the
-     statement type
+     statement type, or do the __root__ trick
     """
     subj: str
     obj: str
@@ -146,7 +147,7 @@ class CommonParents(BaseModel):
     source_id: str
     target_ns: str
     target_id: str
-    common_parents: Optional[List[Tuple[str]]] = []
+    common_parents: Optional[List[Tuple[str, str, str]]] = []
 
 
 class SearchResults(BaseModel):
