@@ -1,4 +1,4 @@
-# fastapi_examples
+# FastAPI examples
 Assembles multiple FastAPI examples in one place
 
 ## Examples ToDo
