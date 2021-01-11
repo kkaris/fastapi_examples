@@ -19,4 +19,5 @@ Assembles multiple FastAPI examples in one place
 - [x] async file io using [aiofiles](https://github.com/Tinche/aiofiles) 
       (used in `examples/to_async_or_not_to_async/async_vs_sync.py`)
 - [ ] async requests using [aiohttp](https://github.com/aio-libs/aiohttp)
+- [ ] Proper use of Pydantic BaseModel (see `examples/pydantic_basemodel`)
 - [ ]
