@@ -6,7 +6,7 @@ efficient
 ### Bugs/fixes
 - [x] No results in result json (check what comes out of the search vs the 
   model used to store the results)
-- [ ] EdgeModel currently has all the 
+- [ ] EdgeModel currently has all the statement types hard-coded
 
 ### Requirements
 - [x] BaseModels (see `service_util.py`):
@@ -39,7 +39,7 @@ These todos are roughly in order
 
 ### Test
 These things need to be tested:
-- [ ] LvL1: Ping server with health requests while a query comes in
+- [X] LvL1: Ping server with health requests while a query comes in
 - [ ] LvL2: Ping server health, do weighted search that takes long time, 
       submit second request as weighted search is ongoing
 
