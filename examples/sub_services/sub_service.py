@@ -126,6 +126,6 @@ elif WORKER_ROLE == 'SIGNED':
 else:
     logger.warning('No worker role assigned, not loading graph')
     network_search_api = IndraNetwork()
-network_search_api.verbose = 2
+network_search_api.verbose = 1
 logger.info('Finished loading graphs, ready for work')
 STATUS.status = 'online'
