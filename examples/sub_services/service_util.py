@@ -137,26 +137,26 @@ class PathResult(BaseModel):
     """
     stmts: Optional[List[Edge]] = None
     path: Optional[List[str]] = None
-    weight_to_show: List[str]
-    cost: str  # string-ified float
-    sort_key: str  # string-ified float
+    weight_to_show: Optional[List[str]] = []
+    cost: Optional[str] = 'nan'  # string-ified float
+    sort_key: Optional[str] = 'nan'  # string-ified float
 
 
 class KShortest(BaseModel):
     """Result for k-shortest paths keyed by path length
     Todo add method for filling out path_hashes??
     """
-    forward: Optional[Dict[str, List[PathResult]]] = {}
-    backward: Optional[Dict[str, List[PathResult]]] = {}
-    path_hashes: Optional[List[str]] = []
+    forward: Optional[Union[Dict[str, List[PathResult]], Dict]] = {}
+    backward: Optional[Union[Dict[str, List[PathResult]], Dict]] = {}
+    path_hashes: Optional[Union[List[str], List]] = []
 
 
 class CommonParents(BaseModel):
     """Result for common parents search"""
-    source_ns: str
-    source_id: str
-    target_ns: str
-    target_id: str
+    source_ns: Optional[str] = None
+    source_id: Optional[str] = None
+    target_ns: Optional[str] = None
+    target_id: Optional[str] = None
     common_parents: Optional[List[Tuple[str, str, str]]] = []
 
 
@@ -164,10 +164,12 @@ class SearchResults(BaseModel):
     """Search results"""
     paths_by_node_count: KShortest
     common_targets: Optional[
-        List[Dict[str, Union[float, List[List[Edge]]]]]] = []
+        Union[List[Dict[str, Union[float, List[List[Edge]]]]], List]
+    ] = []
     shared_regulators: Optional[
-        List[Dict[str, Union[float, List[List[Edge]]]]]] = []
-    common_parents: Optional[CommonParents] = {}
+        Union[List[Dict[str, Union[float, List[List[Edge]]]]], List]
+    ] = []
+    common_parents: Optional[Union[CommonParents, Dict]] = {}
     timeout: bool = False
     node_not_found: Union[str, bool] = False
 
