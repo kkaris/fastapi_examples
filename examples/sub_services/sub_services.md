@@ -37,11 +37,16 @@ These todos are roughly in order
 - [x] **If background job:** no response to ps
 - [ ]
 
-### Test
-These things need to be tested:
+### Stress Testing
+These things need/should to be tested:
 - [X] LvL1: Ping server with health requests while a query comes in
-- [ ] LvL2: Ping server health, do weighted search that takes long time, 
+- [x] LvL2: Ping server health, do weighted search that takes long time, 
       submit second request as weighted search is ongoing
+- [ ] LvL3: Multiple "write" queries (i.e. mesh context queries) at the same 
+      time. The expectation is that queries that change edge attributes of 
+      the same edges with different weights will cause the results to 
+      differ from standalone queries if they interfere.
+- [ ]
 
 ## Potential stuff
 These ides could be implemented now or later, but are not necessary for the 
