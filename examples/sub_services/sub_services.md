@@ -42,10 +42,12 @@ These things need/should to be tested:
 - [X] LvL1: Ping server with health requests while a query comes in
 - [x] LvL2: Ping server health, do weighted search that takes long time, 
       submit second request as weighted search is ongoing
-- [ ] LvL3: Multiple "write" queries (i.e. mesh context queries) at the same 
+- [X] LvL3: Multiple "write" queries (i.e. mesh context queries) at the same 
       time. The expectation is that queries that change edge attributes of 
       the same edges with different weights will cause the results to 
-      differ from standalone queries if they interfere.
+      differ from standalone queries if they interfere. _Note: This has 
+      been tested on a limited scale only and corner cases might still be 
+      possible where results are affected._
 - [ ]
 
 ## Potential stuff
