@@ -18,7 +18,7 @@ TEMPLATES = Path(__file__).parent.absolute().joinpath('templates')
 
 
 # Serve the static files
-app.mount('/static', StaticFiles(directory=STATIC.as_posix()), name='static')
+app.mount('/static', StaticFiles(directory=STATIC), name='static')
 
 # Serve the template to Jinja
 templates = Jinja2Templates(directory=TEMPLATES)
