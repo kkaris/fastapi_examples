@@ -64,7 +64,7 @@ from pathlib import Path
 from fastapi import FastAPI, status as http_status, BackgroundTasks
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
-from indra_depmap_service.util import NetworkSearchQuery
+from indra_network_search.util import NetworkSearchQuery
 
 app = FastAPI()
 HERE = Path(__file__).parent
