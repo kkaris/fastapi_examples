@@ -21,7 +21,7 @@ network_search_api: Optional[IndraNetwork] = None
 logger = getLogger(__name__)
 
 # Initialize with 'booting' before we're done loading stuff
-STATUS: ServiceStatus = ServiceStatus(service_type=WORKER_ROLE,
+STATUS: ServiceStatus = ServiceStatus(service_type=ROLE,
                                       status='booting',
                                       graph_stats={})
 
@@ -99,7 +99,7 @@ async def query(search_query: NetworkSearchQuery,
 # Change to 'online' after everything is loaded
 # asyncio.sleep(5)  # Simulate loading something <- not allowed, can't await
 # outside async function
-if WORKER_ROLE == 'UNSIGNED':
+if ROLE == 'UNSIGNED':
     logger.info('Assuming role as unsigned worker')
     indra_graph = file_opener(FILES['dir_graph']) if FILES['dir_graph'] else\
         None
@@ -107,7 +107,7 @@ if WORKER_ROLE == 'UNSIGNED':
         STATUS.graph_stats['unsigned_edges'] = len(indra_graph.edges)
         STATUS.graph_stats['unsigned_nodes'] = len(indra_graph.nodes)
         network_search_api = IndraNetwork(indra_dir_graph=indra_graph)
-elif WORKER_ROLE == 'SIGNED':
+elif ROLE == 'SIGNED':
     logger.info('Assuming role as signed worker')
     indra_seg = file_opener(FILES['sign_edge_graph']) if FILES[
         'sign_edge_graph'] else None

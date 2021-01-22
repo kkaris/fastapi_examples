@@ -17,7 +17,7 @@ app = FastAPI()
 app.mount('/data', StaticFiles(directory=FASTAPI_DATA_DIR.as_posix()),
           name='data')
 
-STATUS = ServiceStatus(service_type=WORKER_ROLE, status='booting')
+STATUS = ServiceStatus(service_type=ROLE, status='booting')
 HEALTH: Optional[HealthStatus] = None
 
 

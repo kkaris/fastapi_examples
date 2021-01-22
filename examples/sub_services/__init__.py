@@ -3,7 +3,7 @@ from os import environ
 from pathlib import Path
 from .service_util import *
 
-__all__ = ['WORKER_ROLE', 'FILES', 'upload_json', 'upload_json_async',
+__all__ = ['ROLE', 'FILES', 'upload_json', 'upload_json_async',
            'async_pickle_open', 'NetworkSearchQuery', 'Job', 'JobStatus',
            'ServiceStatus', 'Edge', 'PathResult', 'QueryResult',
            'HealthStatus', 'EMPTY_JOB_STATUS', 'StmtInfo', 'SearchResults',
@@ -13,8 +13,8 @@ logger = logging.getLogger(__name__)
 
 # Set service configs
 try:
-    WORKER_ROLE = environ['WORKER_ROLE']  # Sets the identity of the service
-    assert WORKER_ROLE in {'UNSIGNED', 'SIGNED', 'PUBLIC_API'}
+    ROLE = environ['WORKER_ROLE']  # Sets the identity of the service
+    assert ROLE in {'UNSIGNED', 'SIGNED', 'PUBLIC_API', 'FRONTEND'}
     public_port = environ['MAIN_PORT']
     signed_port = environ['SIGNED_PORT']
     unsigned_port = environ['UNSIGNED_PORT']
