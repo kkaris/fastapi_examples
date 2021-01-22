@@ -1,32 +1,34 @@
 """
-Serves front-end
-
-Todo: This services provides a frontend to what was previously done in
- python script
- Consider hosting the data directory (from the subservices) here as well
- instead of calling that service (can be good to if you just want to test
- the JS approach without running all the services)
+This services provides a frontend to what was previously done in python script
+Todo:
+ - Consider hosting the data directory (from the subservices) here as well
+   instead of calling that service (can be good to if you just want to test
+   the JS approach without running all the services)
 """
 import json
 import logging
 from typing import Optional
 from fastapi import FastAPI, Request
+from pathlib import Path
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from depmap_analysis.util.aws import check_existence_and_date_s3, \
     read_query_json_from_s3
 from indra_network_search.net import EMPTY_RESULT
-from indra_network_search.util import TEMPLATES as NETSEARCH_TEMPLATES, \
-    STATIC as NETSEARCH_STATIC
 from .service_util import FASTAPI_DATA_DIR
 
 logger = logging.getLogger(__name__)
 
+STATIC = Path(__file__).parent.joinpath('static').absolute().as_posix()
+print(f'STATIC={STATIC}')
+TEMPLATES = Path(__file__).parent.joinpath('templates').absolute().as_posix()
+print(f'TEMPLATES={TEMPLATES}')
+
 app = FastAPI()
-app.mount('/static', StaticFiles(directory=NETSEARCH_STATIC), name='static')
+app.mount('/static', StaticFiles(directory=STATIC), name='static')
 app.mount('/data', StaticFiles(directory=FASTAPI_DATA_DIR), name='data')
-templates = Jinja2Templates(directory=NETSEARCH_TEMPLATES)
+templates = Jinja2Templates(directory=TEMPLATES)
 
 NS_LIST_ = ['NAMESPACE1', 'NAMESPACE2', 'NAMESPACE3']
 INDRA_DB_FROMAGENTS = 'https://db.indra.bio/statements/from_agents'
