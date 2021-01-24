@@ -181,11 +181,7 @@ function submitQuery() {
 
 function getMetaJson (queryHash) {
   return new Promise(resolve => {
-    resolve(
-      $.get({
-        url: `http://localhost:8000/data/${queryHash}_meta.json`
-      })
-    )
+    resolve($.get({url: `http://localhost:8000/data/${queryHash}_meta.json`}))
   })
 }
 
