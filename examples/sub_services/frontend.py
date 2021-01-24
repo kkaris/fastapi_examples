@@ -13,7 +13,7 @@ from pathlib import Path
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from depmap_analysis.util.aws import check_existence_and_date_s3, \
+from indra_network_search.util import check_existence_and_date_s3, \
     read_query_json_from_s3
 from indra_network_search.net import EMPTY_RESULT
 from .service_util import FASTAPI_DATA_DIR
@@ -35,13 +35,13 @@ INDRA_DB_FROMAGENTS = 'https://db.indra.bio/statements/from_agents'
 
 
 @app.get('/', response_class=HTMLResponse)
-async def query_page(request: Request, query: Optional[int] = None):
+def query_page(request: Request, query: Optional[int] = None):
     """Loads or responds to queries submitted on the query page"""
     logger.info('Got query')
     # logger.info('Incoming Args -----------')
     # logger.info(repr(request.args))
 
-    stmt_types = ['Activation', 'Phosphorylation', '']
+    stmt_types = ['Activation', 'Phosphorylation', 'Complex']
     has_signed_graph = False
 
     # Get query hash from parameters
