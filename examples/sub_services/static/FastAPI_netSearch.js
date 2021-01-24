@@ -179,6 +179,41 @@ function submitQuery() {
   console.log(response);
 }
 
+function getMetaJson (queryHash) {
+  return new Promise(resolve => {
+    resolve(
+      $.get({
+        url: `http://localhost:8000/data/${queryHash}_meta.json`
+      })
+    )
+  })
+}
+
+async function checkStatus(queryHash) {
+  const dataJson = await getMetaJson(queryHash);
+  if (dataJson.error) {
+    console.log('Error occured: ', dataJson.error);
+    return false;
+  }
+  else {
+    console.log('Call was successful: here\'s your data:');
+    console.log(dataJson);
+    switch (dataJson.status) {
+      case 'done':
+        console.log('Work is done');
+        break;
+      case 'working':
+        console.log('Your query is being resolved');
+        break;
+      case 'pending':
+        console.log('Your query is in the queue');
+        break;
+      default:
+        console.log('Oops! Something went wrong: ', dataJson.status)
+    }
+  }
+}
+
 function isEmptyResult(resultJson, allowTimeOut=false) {
   /* Check if the resulting json from the query is empty
   EMPTY_RESULT = {'paths_by_node_count': {'forward': {}, 'backward': {}},
