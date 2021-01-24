@@ -194,20 +194,27 @@ async function checkStatus(queryHash) {
   else {
     console.log('Call was successful: here\'s your data:');
     console.log(dataJson);
+    let text = 'Oops! Something went wrong: ' + dataJson.status;
     switch (dataJson.status) {
       case 'done':
-        console.log('Work is done');
+        text = 'Work is done, getting results';
         break;
       case 'working':
-        console.log('Your query is being resolved');
+        text = 'Your query is being resolved';
         break;
       case 'pending':
-        console.log('Your query is in the queue');
+        text = 'Your query is in the queue';
         break;
       default:
         console.log('Oops! Something went wrong: ', dataJson.status)
     }
+    console.log(text);
+    setStatusText(text);
   }
+}
+
+function setStatusText(text) {
+  document.getElementById('query-status').innerHTML = text;
 }
 
 function isEmptyResult(resultJson, allowTimeOut=false) {
