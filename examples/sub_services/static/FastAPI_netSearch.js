@@ -577,7 +577,13 @@ function generatePathLinkout(pathArray) {
       let obj = edgeDict.obj;
       htmlString += `<h5><b>${subj} &rarr; ${obj}</b><span class="float-right">Statement types: ${(Object.keys(edgeDict).length-2).toString()}</span></h5>`;
       for (let stmt_type in edgeDict) {
-        if ((stmt_type !== 'subj') && (stmt_type !== 'obj') && (stmt_type !== 'weight_to_show')) {
+        if ((stmt_type !== 'subj') && (stmt_type !== 'obj') &&
+          (stmt_type !== 'weight_to_show') && (edgeDict[stmt_type])) {
+          // FixMe: edgeDict[stmt_type] is added because all statement
+          //  types had to be added explicitly in the BaseModel. This is
+          //  something that needs to be fixed where the results are
+          //  assembled into JSONs. Either via adding dynamic name
+          //  attributes or by restructuring the JSON.
           // let dbLink = '';
           // if (stmt.stmt_hash.startsWith('http')) dbLink = stmt.stmt_hash;
           // ?subject=BRCA1&object=BRCA2&type=activation&ev_limit=1
@@ -613,13 +619,17 @@ function generatePathWeights(pathArray) {
 function generateSourceBadges(stmt_list) {
   // ToDo Add upp source counts in source dict
   let all_source_counts = {};
-  for (let stmt of stmt_list) {
-    let source_counts = stmt.source_counts;
-    for (let source in source_counts) {
-      if (all_source_counts[source]) all_source_counts[source] += source_counts[source];
-      else all_source_counts[source] = source_counts[source];
+  stmt_list.forEach(function (stmt, index, stmt_list) {
+    let sourceCounts = stmt.source_counts;
+    for (let source in sourceCounts) {
+      if (all_source_counts[source]) {
+        all_source_counts[source] += sourceCounts[source];
+      }
+      else {
+        all_source_counts[source] = sourceCounts[source];
+      }
     }
-  }
+  });
   let htmlString = '';
   let badgeStart = '<span class="badge badge-secondary badge-pill float-right ';
   let badgeEnd = '</span>';
@@ -637,7 +647,14 @@ function generateTargetLinkout(pathPair) {
       let obj = path.obj;
       htmlString += `<h5><b>${subj} &rarr; ${obj}</b><span class="float-right">Support: ${(Object.keys(path).length-2).toString()}</span></h5>`;
       for (let stmt_type in path) {
-        if ((stmt_type !== 'subj') && (stmt_type !== 'obj') && (stmt_type !== 'weight_to_show')) {
+        if ((stmt_type !== 'subj') && (stmt_type !== 'obj') &&
+          (stmt_type !== 'weight_to_show') && path[stmt_type]) {
+          // FixMe: edgeDict[stmt_type] is added because all statement
+          //  types had to be added explicitly in the BaseModel. This is
+          //  something that needs to be fixed where the results are
+          //  assembled into JSONs. Either via adding dynamic name
+          //  attributes or by restructuring the JSON.
+
           // let dbLink = '';
           // if (stmt.stmt_hash.startsWith('http')) dbLink = stmt.stmt_hash;
           // else dbLink = INDRA_DB_URL_HASH + stmt.stmt_hash + '?format=html';
