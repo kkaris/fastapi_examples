@@ -9,7 +9,7 @@ Run this as a server using uvicorn with:
 import asyncio
 from time import sleep
 from depmap_analysis.util.io_functions import file_opener
-from depmap_analysis.network_functions.indra_network import IndraNetwork
+from indra_network_search.net import IndraNetwork
 from typing import Union, Optional
 from numpy.random import exponential as rnd_exp
 from networkx import DiGraph, MultiGraph

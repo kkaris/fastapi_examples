@@ -9,7 +9,7 @@ from os import environ
 from typing import Optional, Dict, List, Union, Tuple
 from pathlib import Path
 from pydantic import BaseModel
-from indra_depmap_service.util import NetworkSearchQuery
+from indra_network_search.data_models import NetworkSearchQuery
 
 __all__ = ['NetworkSearchQuery', 'Job', 'JobStatus', 'ServiceStatus',
            'Edge', 'PathResult', 'QueryResult', 'HealthStatus',
