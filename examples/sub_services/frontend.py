@@ -16,6 +16,7 @@ from fastapi.staticfiles import StaticFiles
 from indra_network_search.util import check_existence_and_date_s3, \
     read_query_json_from_s3
 from indra_network_search.net import EMPTY_RESULT
+from indra.statements.agent import default_ns_order as NS_LIST_
 from .service_util import FASTAPI_DATA_DIR
 
 logger = logging.getLogger(__name__)
@@ -30,7 +31,6 @@ app.mount('/static', StaticFiles(directory=STATIC), name='static')
 app.mount('/data', StaticFiles(directory=FASTAPI_DATA_DIR), name='data')
 templates = Jinja2Templates(directory=TEMPLATES)
 
-NS_LIST_ = ['NAMESPACE1', 'NAMESPACE2', 'NAMESPACE3']
 INDRA_DB_FROMAGENTS = 'https://db.indra.bio/statements/from_agents'
 
 
@@ -42,7 +42,7 @@ def query_page(request: Request, query: Optional[int] = None):
     # logger.info(repr(request.args))
 
     stmt_types = ['Activation', 'Phosphorylation', 'Complex']
-    has_signed_graph = False
+    has_signed_graph = False  # FixMe: Temporary solution
 
     # Get query hash from parameters
     qh = query
