@@ -83,14 +83,17 @@ async def health():
 async def query(search_query: NetworkSearchQuery,
                 bgt: BackgroundTasks):
     """Runs a query and uploads status and potential results"""
-    logger.info(f'Handling query {search_query.get_hash()}')
-    meta_name = f'{search_query.get_hash()}_meta.json'
+    qh = search_query.get_hash()
+    logger.info(f'Handling query {qh}')
+    meta_name = f'{qh}_meta.json'
     meta_loc = f'/data/{meta_name}'
-    job_status = JobStatus(id=search_query.get_hash(),
+    result_loc = f'/data/{qh}_result.json'
+    job_status = JobStatus(id=qh,
                            status='pending',
                            fname=meta_name,
-                           location=meta_loc)
-    logger.info(f'Updating {search_query.get_hash()} to pending')
+                           location=meta_loc,
+                           result_location=result_loc)
+    logger.info(f'Updating {qh} to pending')
     bgt.add_task(upload_json, job_status)
     bgt.add_task(handle_query, search_query, job_status)
     return job_status
@@ -107,6 +110,7 @@ if ROLE == 'UNSIGNED':
         STATUS.graph_stats['unsigned_edges'] = len(indra_graph.edges)
         STATUS.graph_stats['unsigned_nodes'] = len(indra_graph.nodes)
         network_search_api = IndraNetwork(indra_dir_graph=indra_graph)
+        network_search_api.verbose = 1
 elif ROLE == 'SIGNED':
     logger.info('Assuming role as signed worker')
     indra_seg = file_opener(FILES['sign_edge_graph']) if FILES[
@@ -121,9 +125,10 @@ elif ROLE == 'SIGNED':
         STATUS.graph_stats['signed_node_nodes'] = len(indra_sng.nodes)
         network_search_api = IndraNetwork(indra_sign_edge_graph=indra_seg,
                                           indra_sign_node_graph=indra_sng)
+        network_search_api.verbose = 1
 else:
     logger.warning('No worker role assigned, not loading graph')
     network_search_api = IndraNetwork()
-network_search_api.verbose = 1
+    network_search_api.verbose = 1
 logger.info('Finished loading graphs, ready for work')
 STATUS.status = 'online'
