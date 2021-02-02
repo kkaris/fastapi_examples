@@ -180,9 +180,18 @@ function submitQuery() {
   console.log(response);
 }
 
+// Helpers to get json files
 function getMetaJson (queryHash) {
+  return getJson(`${queryHash}_meta.json`)
+}
+
+function getResultJson(queryHash) {
+  return getJson(`${queryHash}_result.json`)
+}
+
+function getJson(fname) {
   return new Promise(resolve => {
-    resolve($.get({url: `http://localhost:8000/data/${queryHash}_meta.json`}))
+    resolve($.getJSON({url: `/data/${fname}`}))
   })
 }
 
