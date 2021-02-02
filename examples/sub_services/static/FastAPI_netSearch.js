@@ -195,32 +195,46 @@ function getJson(fname) {
   })
 }
 
-async function checkStatus(queryHash) {
-  const dataJson = await getMetaJson(queryHash);
-  if (dataJson.error) {
-    console.log('Error occured: ', dataJson.error);
-    return false;
+// Runs the full cycle of get meta json and telling the user what's up,
+// then calls itself if status is not 'done'
+const checkStatus = async function (queryHash) {
+  let timeoutID = 0;
+  let submitBtn = document.getElementById('querySubmitBtn');
+  $.getJSON( `/data/${queryHash}_result.json`, function(data) {})
+  .done(function(data, textStatus, jqXHR) {
+      console.log( "DONE" );
+      console.log( "data: ", data );
+      console.log( "textStatus: ", textStatus );
+      console.log( "jqXHR: ", jqXHR );
+      fillResultsTable(data, 'unknown source', 'unknown target');
+      setStatusText(textStatus);
+      submitBtn.disabled = false;
+  })
+  .fail(function (jqXHR, textStatus, errorThrown) {
+      console.log( "FAIL" );
+      console.log( "errorThrown: ", errorThrown );
+      console.log( "textStatus: ", textStatus );
+      console.log( "jqXHR: ", jqXHR );
+      if (jqXHR.status === 404) {
+        setStatusText('Your query is pending');
+        timeoutID = window.setTimeout(checkStatus, 4000, queryHash);
+      }
+      if (jqXHR.status !== 404) {
+        setStatusText('Something went wrong!')
+      }
+
+  })
+  .always(function() {
+      console.log( "ALWAYS" );
+  });
+  console.log(`Running timer: ${timeoutID}`);
+  if (timeoutID === 0) {
+    clearAlert(timeoutID)
   }
-  else {
-    console.log('Call was successful: here\'s your data:');
-    console.log(dataJson);
-    let text = 'Oops! Something went wrong: ' + dataJson.status;
-    switch (dataJson.status) {
-      case 'done':
-        text = 'Work is done, getting results';
-        break;
-      case 'working':
-        text = 'Your query is being resolved';
-        break;
-      case 'pending':
-        text = 'Your query is in the queue';
-        break;
-      default:
-        console.log('Oops! Something went wrong: ', dataJson.status)
-    }
-    console.log(text);
-    setStatusText(text);
-  }
+};
+
+function clearAlert(timeoutID) {
+  window.clearTimeout(timeoutID);
 }
 
 function setStatusText(text) {
