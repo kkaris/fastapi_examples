@@ -9,10 +9,23 @@ from requests.exceptions import ConnectionError
 from fastapi import FastAPI, status as http_status
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
 from . import *
 
 logger = logging.getLogger(__name__)
 app = FastAPI()
+
+if RUNNING_LOCALHOST:
+    origins = ['http://localhost:5000', 'http://localhost']
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=origins,
+        allow_credentials=True,
+        allow_methods=['*'],
+        allow_headers=['*']
+    )
+    logger.info('Running localhost, allowing CORSMiddleware with origins '
+                'localhost:5000')
 
 app.mount('/data', StaticFiles(directory=FASTAPI_DATA_DIR.as_posix()),
           name='data')
