@@ -1,4 +1,5 @@
 const SUBMIT_URL = './query/submit';
+const QUERY_URL = 'http://localhost:8000/query';
 const S3_QUERY_CAHCE = 'https://bigmech.s3.amazonaws.com/indra_network_search/';
 const MAX_K_PATHS = 50;
 let pathStmtHashes = [];
