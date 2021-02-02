@@ -46,7 +46,7 @@ These todos are roughly in order
 - [ ] Activate search button again
 - [ ]
 
-### Stress Testing
+### Backend Stress Testing
 These things need/should to be tested:
 - [X] LvL1: Ping server with health requests while a query comes in
 - [x] LvL2: Ping server health, do weighted search that takes long time, 
@@ -61,11 +61,16 @@ These things need/should to be tested:
 
 ### Frontend Testing
 - [ ] Search cycle pass 
-- [ ] Subsequent search after first search has finished
+- Subsequent search after first search has finished (JS)
+  - [X] Subsequent search works
+  - [ ] Wipe out old results when submitting new result
+  - [ ]
 - [ ] User messaging works ('pending' -> 'working' -> 'done')
+  - JSON string is shown instead of actual status code
+  - When search is done "Error: False" is shown instead of "done"
 - [ ] Button deactivation and activation
 - [ ] Download stmts
-- [ ] 
+- [ ]
 
 ## Potential stuff
 These ides could be implemented now or later, but are not necessary for the 
@@ -76,3 +81,4 @@ minimal working example
       upload of S3 files. See also 
       [aiobotocore](https://github.com/aio-libs/aiobotocore) and this
       [how-to](https://medium.com/tysonworks/concurrency-with-boto3-41cfa300aab4)
+- [ ]
