@@ -7,12 +7,14 @@ __all__ = ['ROLE', 'FILES', 'upload_json', 'upload_json_async',
            'async_pickle_open', 'NetworkSearchQuery', 'Job', 'JobStatus',
            'ServiceStatus', 'Edge', 'PathResult', 'QueryResult',
            'HealthStatus', 'EMPTY_JOB_STATUS', 'StmtInfo', 'SearchResults',
-           'CommonParents', 'KShortest', 'FASTAPI_DATA_DIR', 'SERVICE_URLS']
+           'CommonParents', 'KShortest', 'FASTAPI_DATA_DIR', 'SERVICE_URLS',
+           'RUNNING_LOCALHOST']
 
 logger = logging.getLogger(__name__)
 
 # Set service configs
 try:
+    RUNNING_LOCALHOST = environ.get('API_DEV')
     ROLE = environ['WORKER_ROLE']  # Sets the identity of the service
     assert ROLE in {'UNSIGNED', 'SIGNED', 'PUBLIC_API', 'FRONTEND'}
     public_port = environ['MAIN_PORT']
