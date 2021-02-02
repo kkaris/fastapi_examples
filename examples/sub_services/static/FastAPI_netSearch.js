@@ -140,8 +140,11 @@ function submitQuery() {
   // Empty hash list on submit
   pathStmtHashes = [];
 
-  let _url = SUBMIT_URL;
+  let _url = QUERY_URL;
+  let submitBtn = document.getElementById('querySubmitBtn');
   statusBox.textContent = 'Query submitted...';
+  submitBtn.disabled = true;
+  clearAllTables();
   console.log('Query submitted:');
   console.log(queryDict);
   let response = $.ajax({
@@ -163,6 +166,9 @@ function submitQuery() {
             console.log(xhr.responseText)
           }
           statusBox.textContent = xhr.responseText;
+          checkStatus(xhr.responseJSON.id).then(() => {
+            console.log('CheckStatus resolved')
+          });
           break;
         case 504:
           // Server timeout
