@@ -2,6 +2,11 @@
 The minimal working example for how to make the NetworkSearch API more 
 efficient
 
+## Running
+
+This example can be run by executing the startup script, `run_services.sh`, 
+that is in the `examples` folder.
+
 ## ToDos
 ### Bugs/fixes
 - [x] No results in result json (check what comes out of the search vs the 
