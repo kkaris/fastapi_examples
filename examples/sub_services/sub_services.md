@@ -7,6 +7,7 @@ efficient
 - [x] No results in result json (check what comes out of the search vs the 
   model used to store the results)
 - [ ] EdgeModel currently has all the statement types hard-coded
+- [ ]
 
 ### Requirements
 - [x] BaseModels (see `service_util.py`):
@@ -39,10 +40,10 @@ These todos are roughly in order
 
 ### Frontend cycle
 - [X] Submit request
-- [ ] Disable search button
+- [X] Disable search button
 - [X] On 202 returned, get the hash, try to get results
-- [ ] While 404 for results json, sleep n sec and try again
-- [ ] Upon 200 for results json, fill results
+- [X] While 404 for results json, sleep n sec and try again
+- [X] Upon 200 for results json, fill results
 - [ ] Activate search button again
 - [ ]
 
