@@ -44,7 +44,7 @@ These todos are roughly in order
 - [X] On 202 returned, get the hash, try to get results
 - [X] While 404 for results json, sleep n sec and try again
 - [X] Upon 200 for results json, fill results
-- [ ] Activate search button again
+- [X] Activate search button again
 - [ ]
 
 ### Backend Stress Testing
@@ -61,16 +61,16 @@ These things need/should to be tested:
 - [ ]
 
 ### Frontend Testing
-- [ ] Search cycle pass 
+- [X] Search cycle pass 
 - Subsequent search after first search has finished (JS)
   - [X] Subsequent search works
-  - [ ] Wipe out old results when submitting new result
+  - [X] Wipe out old results when submitting new result
   - [ ]
-- [ ] User messaging works ('pending' -> 'working' -> 'done')
+- [X] User messaging works ('pending' -> 'working' -> 'done')
   - JSON string is shown instead of actual status code
   - When search is done "Error: False" is shown instead of "done"
-- [ ] Button deactivation and activation
-- [ ] Download stmts
+- [X] Button deactivation and activation
+- [ ] (Download stmts)
 - [ ]
 
 ## Potential stuff
