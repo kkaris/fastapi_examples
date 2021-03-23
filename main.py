@@ -103,7 +103,7 @@ def read_item(my_data: MyData):
     # Use `def` instead `async def` when the code runs blocking I/O
     # functions, here illustrated with regular sleep(). This function will
     # be run in an external threadpool, allowing the server to continue to
-    # continue to repsond to requests on its main thread:
+    # repsond to requests on its main thread:
     # https://fastapi.tiangolo.com/async/#path-operation-functions
     sleep(5)
     return my_data
