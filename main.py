@@ -15,6 +15,7 @@ Browse to 'http://localhost:8000/docs' or '.../redoc'
 ## Data validation
 Read more here:
 https://fastapi.tiangolo.com/tutorial/path-params/#data-validation
+https://pydantic-docs.helpmanual.io/
 
 # Validation in path parameters
 https://fastapi.tiangolo.com/tutorial/path-params/
